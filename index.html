@@ -16,6 +16,12 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    html, body {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #FDF8F4;
@@ -111,10 +117,19 @@
       margin-top: 16px;
     }
 
+    /* Safari iOS iframe fix: wrapper catches overflow */
+    #frame-wrap {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
     #app-frame {
       width: 100%;
-      height: 100vh;
-      height: 100dvh;
+      height: 100%;
       border: none;
       display: block;
     }
@@ -136,7 +151,10 @@
     <p class="auth-note">След като влезеш, върни се тук — приложението ще се зареди.</p>
   </div>
 
-  <iframe id="app-frame" allow="camera;microphone"></iframe>
+  <!-- Safari iOS fix: iframe wrapped in overflow:hidden div -->
+  <div id="frame-wrap">
+    <iframe id="app-frame" allow="camera;microphone"></iframe>
+  </div>
 
   <script>
     var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUDssTmamQyK0g1Lz38JYmbWfASw6xLgmYdKqblvYHTj9b0RmB_Kib43lSq6GGGWiiNQ/exec';
@@ -146,7 +164,6 @@
     var authBtn = document.getElementById('auth-btn');
     var isAuthed = false;
 
-    // JSONP callback — извиква се ако потребителят е логнат в Google
     function onAuthCheck(email) {
       isAuthed = true;
       loadApp();
@@ -164,7 +181,6 @@
               showAuthOverlay();
             }
           } catch(e) {
-            // Cross-origin — нормално, скриваме splash
             hideSplash();
           }
         }, 2000);
@@ -188,7 +204,6 @@
       authOverlay.style.display = 'flex';
     }
 
-    // Бутон "Вход с Google"
     authBtn.addEventListener('click', function() {
       var authWindow = window.open(SCRIPT_URL, '_blank');
 
@@ -212,7 +227,6 @@
       }, 120000);
     });
 
-    // СТЪПКА 1: JSONP проверка — логнат ли е потребителят?
     var scriptTag = document.createElement('script');
     scriptTag.src = SCRIPT_URL + '?jsonpCallback=onAuthCheck';
     scriptTag.onerror = function() {
@@ -220,7 +234,6 @@
     };
     document.body.appendChild(scriptTag);
 
-    // Fallback — ако след 6 сек няма отговор
     setTimeout(function() {
       if (!isAuthed) {
         showAuthOverlay();
