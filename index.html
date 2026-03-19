@@ -270,28 +270,11 @@
   // ==========================================================
 
   if (isStandalone) {
-    // STANDALONE MODE
-    // Стъпка 1: JSONP проверка — логнат ли е в Google в standalone контекста?
-    // Ако да → зареждаме iframe директно
-    // Ако не → показваме auth екран с линк за Google login
-    splash.classList.add('show');
-    installLanding.style.display = 'none';
-    
-    var jsonpScript = document.createElement('script');
-    jsonpScript.src = SCRIPT_URL + '?jsonpCallback=onStandaloneAuth';
-    jsonpScript.onerror = function() {
-      // JSONP грешка = не е логнат → покажи auth
-      showStandaloneAuth();
-    };
-    document.body.appendChild(jsonpScript);
-    
-    // Ако след 4 сек няма отговор → не е логнат
-    setTimeout(function() {
-      if (!isAuthed) {
-        showStandaloneAuth();
-      }
-    }, 4000);
-    
+    // STANDALONE MODE — просто redirect към Apps Script
+    // iOS ще го отвори в in-app browser ВЪТРЕ в standalone PWA прозореца
+    // Google auth ще се случи там → после Apps Script зарежда приложението
+    // Standalone mode се ЗАПАЗВА — няма Safari ленти
+    window.location.href = SCRIPT_URL;
   } else {
     // BROWSER: показваме landing page с install инструкции
     splash.style.display = 'none';
