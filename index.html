@@ -270,10 +270,14 @@
   // ==========================================================
 
   if (isStandalone) {
+    // STANDALONE: зареждаме iframe ДИРЕКТНО — без JSONP, без auth overlay
+    // Apps Script сам управлява Google login вътре в iframe-а
+    // Така НИКОГА не правим window.open() което чупи standalone mode-а
     splash.classList.add('show');
     installLanding.style.display = 'none';
-    startAppFlow();
+    loadApp();
   } else {
+    // BROWSER: показваме landing page с install инструкции
     splash.style.display = 'none';
     showPlatformSteps();
     installLanding.classList.add('show');
