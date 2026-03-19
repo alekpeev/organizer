@@ -16,6 +16,9 @@
   <title>Майчин Органайзър</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://script.google.com">
+  <link rel="dns-prefetch" href="https://script.googleusercontent.com">
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--pink:#F2A7C3;--pink-l:#FDE8F0;--pink-d:#D4688A;--cream:#FDF8F4;--mint:#A8D8C8;--mint-l:#E0F5EF;--lav:#C4B5E8;--lav-l:#EDE8FA;--text:#3D2B2B;--text-s:#8A6B6B;--text-xs:#B09898;--white:#fff}
@@ -222,11 +225,16 @@
     installLanding.classList.add('show');
   }
 
-  // === JSONP Auth Check ===
+  // === JSONP Auth Check + ПАРАЛЕЛНО preload на iframe ===
   function checkAuth() {
     var cbName = 'gasAuthCb_' + Math.round(Math.random() * 100000);
     var resolved = false;
     var script = document.createElement('script');
+
+    // ПАРАЛЕЛНО: започваме да зареждаме iframe още сега
+    // Ако потребителят е логнат, iframe ще е готов по-бързо
+    frame.src = GAS_URL;
+    frame.classList.add('visible');
 
     // Успех — потребителят е логнат
     window[cbName] = function(data) {
@@ -236,10 +244,20 @@
       script.remove();
 
       if (data && data.email) {
-        // ЛОГНАТ! Зареждаме iframe
-        loadApp();
+        // ЛОГНАТ! iframe вече се зарежда паралелно
+        appLoaded = true;
+        splashSub.textContent = 'Зарежда се...';
+        // Чакаме iframe да зареди
+        frame.addEventListener('load', function onL() {
+          frame.removeEventListener('load', onL);
+          setTimeout(hideSplash, 400);
+        });
+        // Fallback
+        setTimeout(hideSplash, 10000);
       } else {
-        // Празен email — не е логнат
+        // Празен email — не е логнат, спираме iframe
+        frame.src = 'about:blank';
+        frame.classList.remove('visible');
         showLoginButton();
       }
     };
@@ -250,6 +268,8 @@
       resolved = true;
       delete window[cbName];
       script.remove();
+      frame.src = 'about:blank';
+      frame.classList.remove('visible');
       showLoginButton();
     };
 
@@ -257,6 +277,8 @@
     setTimeout(function() {
       if (!resolved) {
         resolved = true;
+        frame.src = 'about:blank';
+        frame.classList.remove('visible');
         showLoginButton();
       }
     }, 3000);
@@ -290,9 +312,9 @@
     frame.classList.add('visible');
     frame.addEventListener('load', function onL() {
       frame.removeEventListener('load', onL);
-      setTimeout(hideSplash, 1500);
+      setTimeout(hideSplash, 400);
     });
-    setTimeout(hideSplash, 12000);
+    setTimeout(hideSplash, 10000);
   }
 
   function hideSplash() {
