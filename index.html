@@ -270,47 +270,27 @@
   // ==========================================================
 
   if (isStandalone) {
-    // STANDALONE: опитваме iframe директно
-    // Ако потребителят е логнат в Google в standalone контекста — ще работи
-    // Ако не е — ще покажем auth overlay
+    // STANDALONE MODE
+    // Стъпка 1: JSONP проверка — логнат ли е в Google в standalone контекста?
+    // Ако да → зареждаме iframe директно
+    // Ако не → показваме auth екран с линк за Google login
     splash.classList.add('show');
     installLanding.style.display = 'none';
     
-    // Опит 1: зареждаме iframe
-    frame.src = SCRIPT_URL;
-    frame.classList.add('visible');
+    var jsonpScript = document.createElement('script');
+    jsonpScript.src = SCRIPT_URL + '?jsonpCallback=onStandaloneAuth';
+    jsonpScript.onerror = function() {
+      // JSONP грешка = не е логнат → покажи auth
+      showStandaloneAuth();
+    };
+    document.body.appendChild(jsonpScript);
     
-    // Проверяваме дали iframe зареди успешно
-    var iframeLoaded = false;
-    frame.addEventListener('load', function onL() {
-      frame.removeEventListener('load', onL);
-      iframeLoaded = true;
-      // Даваме малко време — ако е 403, iframe ще е празен/малък
-      setTimeout(function() {
-        try {
-          // Опитваме да проверим дали iframe има съдържание
-          // Cross-origin ще хвърли грешка — това е ОК, значи зареди нещо
-          var test = frame.contentWindow.location.href;
-        } catch(e) {
-          // Cross-origin грешка = iframe зареди съдържание (Apps Script)
-          // Това е ДОБРЕ — значи работи
-          hideSplash();
-          return;
-        }
-        // Ако няма грешка = same-origin = вероятно 403 страница или празен
-        hideSplash();
-      }, 2000);
-    });
-    
-    // Fallback: ако iframe не зареди за 4 сек — покажи auth
+    // Ако след 4 сек няма отговор → не е логнат
     setTimeout(function() {
-      if (!iframeLoaded) {
+      if (!isAuthed) {
         showStandaloneAuth();
       }
     }, 4000);
-    
-    // Втори fallback: скрий splash след 8 сек каквото и да стане
-    setTimeout(function() { hideSplash(); }, 8000);
     
   } else {
     // BROWSER: показваме landing page с install инструкции
@@ -365,6 +345,13 @@
     loadApp();
   };
 
+  // Callback за standalone JSONP проверка
+  window.onStandaloneAuth = function(email) {
+    isAuthed = true;
+    // Логнат е! Зареждаме iframe
+    loadApp();
+  };
+
   function loadApp() {
     if (appLoaded) return;
     appLoaded = true;
@@ -401,7 +388,7 @@
     saDiv.innerHTML = '<img src="icon-192.png" alt="Лого" style="width:90px;height:90px;border-radius:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(212,104,138,.2)">'
       + '<div style="font-family:Playfair Display,serif;font-size:1.4rem;color:#D4688A;margin-bottom:12px">Добре дошла!</div>'
       + '<div style="font-size:.95rem;color:#8A6B6B;margin-bottom:28px;line-height:1.6">За да използваш приложението,<br>трябва да влезеш с Google акаунта си.</div>'
-      + '<a href="' + SCRIPT_URL + '" target="_blank" style="background:linear-gradient(135deg,#F2A7C3,#D4688A);color:white;text-decoration:none;padding:15px 36px;border-radius:14px;font-size:1.05rem;font-weight:600;display:inline-block;box-shadow:0 6px 20px rgba(212,104,138,.35);font-family:DM Sans,sans-serif">Вход с Google</a>'
+      + '<a href="' + SCRIPT_URL + '?auth=1" target="_blank" style="background:linear-gradient(135deg,#F2A7C3,#D4688A);color:white;text-decoration:none;padding:15px 36px;border-radius:14px;font-size:1.05rem;font-weight:600;display:inline-block;box-shadow:0 6px 20px rgba(212,104,138,.35);font-family:DM Sans,sans-serif">Вход с Google</a>'
       + '<div style="font-size:.78rem;color:#B09898;margin-top:16px;line-height:1.5">След като влезеш в Google,<br>натисни бутона отдолу.</div>'
       + '<button id="sa-reload-btn" style="margin-top:20px;background:#A8D8C8;color:white;border:none;padding:14px 32px;border-radius:14px;font-size:1rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;box-shadow:0 4px 12px rgba(168,216,200,.4)">🔄 Зареди приложението</button>';
     document.body.appendChild(saDiv);
