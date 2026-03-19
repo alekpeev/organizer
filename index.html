@@ -21,20 +21,30 @@
     :root{--pink:#F2A7C3;--pink-l:#FDE8F0;--pink-d:#D4688A;--cream:#FDF8F4;--mint:#A8D8C8;--mint-l:#E0F5EF;--lav:#C4B5E8;--lav-l:#EDE8FA;--text:#3D2B2B;--text-s:#8A6B6B;--text-xs:#B09898;--white:#fff}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{height:100%;height:100dvh;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased}
+
+    /* IFRAME */
     #app-frame{position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:none;display:none;z-index:1;background:var(--cream)}
     #app-frame.visible{display:block}
-    #splash{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:50;transition:opacity .5s,visibility .5s}
-    #splash.show{display:flex}
+
+    /* SPLASH / AUTH CHECK */
+    #splash{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;transition:opacity .5s,visibility .5s}
     #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
     .splash-icon{width:110px;height:110px;border-radius:26px;box-shadow:0 8px 32px rgba(212,104,138,.25);margin-bottom:20px;animation:pulse 2s ease-in-out infinite}
     .splash-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--pink-d);text-align:center;line-height:1.2}
-    .splash-sub{color:var(--text-s);font-size:.9rem;margin-top:10px}
+    .splash-sub{color:var(--text-s);font-size:.9rem;margin-top:10px;transition:opacity .3s}
     .splash-dots{display:flex;gap:7px;margin-top:24px}
     .splash-dots span{width:9px;height:9px;border-radius:50%;background:var(--pink);animation:dot 1.2s ease infinite}
     .splash-dots span:nth-child(2){animation-delay:.2s;background:var(--mint)}
     .splash-dots span:nth-child(3){animation-delay:.4s;background:var(--lav)}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
     @keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.2);opacity:1}}
+
+    /* LOGIN BUTTON (показва се в splash при нелогнат) */
+    #login-btn{display:none;margin-top:28px;background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:16px 40px;border-radius:16px;font-size:1.1rem;font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
+    #login-btn:active{transform:scale(.96)}
+    #login-note{display:none;font-size:.78rem;color:var(--text-xs);margin-top:14px;line-height:1.5;text-align:center}
+
+    /* AUTH OVERLAY (browser mode) */
     #auth-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:60;padding:32px;text-align:center}
     .auth-icon{width:90px;height:90px;border-radius:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(212,104,138,.2)}
     .auth-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--pink-d);margin-bottom:12px}
@@ -42,6 +52,8 @@
     .auth-btn{background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:15px 36px;border-radius:14px;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
     .auth-btn:active{transform:scale(.97)}
     .auth-note{font-size:.78rem;color:var(--text-xs);margin-top:16px;line-height:1.5}
+
+    /* INSTALL LANDING */
     #install-landing{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0 0%,#FDF8F4 40%,#E0F5EF 100%);display:none;z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch}
     #install-landing.show{display:block}
     .landing-inner{max-width:440px;margin:0 auto;padding:0 20px;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
@@ -99,13 +111,17 @@
 </head>
 <body>
 
+<!-- SPLASH + LOGIN -->
 <div id="splash">
   <img src="icon-192.png" alt="Лого" class="splash-icon">
   <div class="splash-title">Майчин<br>Органайзър</div>
-  <div class="splash-sub">Зарежда се...</div>
-  <div class="splash-dots"><span></span><span></span><span></span></div>
+  <div id="splash-sub" class="splash-sub">Проверка на профила...</div>
+  <div id="splash-dots" class="splash-dots"><span></span><span></span><span></span></div>
+  <button id="login-btn">Вход с Google</button>
+  <div id="login-note">Еднократно влизане с Google акаунта ти.<br>След това приложението ще се отваря директно.</div>
 </div>
 
+<!-- AUTH OVERLAY (browser mode) -->
 <div id="auth-overlay">
   <img src="icon-192.png" alt="Лого" class="auth-icon">
   <div class="auth-title">Добре дошла!</div>
@@ -114,8 +130,10 @@
   <div class="auth-note">След като влезеш, върни се тук —<br>приложението ще се зареди.</div>
 </div>
 
+<!-- IFRAME -->
 <iframe id="app-frame" allow="camera;microphone"></iframe>
 
+<!-- INSTALL LANDING -->
 <div id="install-landing">
   <div class="landing-inner">
     <div class="landing-hero">
@@ -132,29 +150,17 @@
     <div class="install-cta">
       <div class="cta-title"><span class="cta-emoji">📲</span> Запази на телефона си</div>
       <div id="ios-safari-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни бутона „Сподели"</div><div class="step-desc">Долу в лентата на Safari</div><div class="safari-bar"><div class="safari-icons"><span>◀</span><span>▶</span><div class="share-btn"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div class="share-dot">!</div></div><span>📖</span><span>⧉</span></div><div class="bar-hint">↑ Натисни тук</div></div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Намери „Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div><div class="menu-mock"><div class="menu-item"><span>📋</span> Копирай</div><div class="menu-item"><span>🔖</span> Добави отметка</div><div class="menu-item hl"><span>➕</span> Към Начален екран</div></div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Горе вдясно — и готово!</div><div class="add-mock"><div class="add-row"><span class="add-cancel">Откажи</span><span class="add-title-m">Към Нач. екран</span><span class="add-btn-m">Добави</span></div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни „Сподели"</div><div class="step-desc">Долу в лентата на Safari</div><div class="safari-bar"><div class="safari-icons"><span>◀</span><span>▶</span><div class="share-btn"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div class="share-dot">!</div></div><span>📖</span><span>⧉</span></div><div class="bar-hint">↑ Натисни тук</div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div><div class="menu-mock"><div class="menu-item"><span>📋</span> Копирай</div><div class="menu-item hl"><span>➕</span> Към Начален екран</div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Горе вдясно — готово!</div></div></div></div>
       </div>
-      <div id="ios-chrome-steps" style="display:none">
-        <div class="warning-box"><strong>⚠️ Използваш Chrome на iPhone.</strong><br>За да запазиш приложението, трябва да го отвориш в <strong>Safari</strong>.</div>
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Копирай линка</div><div class="step-desc">Натисни и задръж адресната лента → Копирай</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Отвори Safari</div><div class="step-desc">Постави линка в Safari и отвори</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Сподели" → „Към Нач. екран"</div><div class="step-desc">Следвай стъпките за Safari</div></div></div></div>
-      </div>
+      <div id="ios-chrome-steps" style="display:none"><div class="warning-box"><strong>⚠️ Отвори в Safari</strong> — само Safari поддържа „Към Нач. екран" на iPhone.</div></div>
       <div id="android-chrome-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни менюто ⋮</div><div class="step-desc">Трите точки горе вдясно в Chrome</div><div class="chrome-bar"><div class="chrome-row"><div class="chrome-url">alekpeev.github.io</div><div class="chrome-dots">⋮<div class="share-dot">!</div></div></div><div class="chrome-hint">↑ Натисни тук</div></div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Избери „Добави към Нач. екран"</div><div class="step-desc">Или „Инсталиране на приложение"</div><div class="chrome-menu"><div class="chrome-mi"><span>⭐</span> Отметки</div><div class="chrome-mi hl"><span>📱</span> Добави към Нач. екран</div><div class="chrome-mi"><span>⚙️</span> Настройки</div></div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди с „Инсталиране"</div><div class="step-desc">И готово!</div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Менюто ⋮</div><div class="step-desc">Горе вдясно в Chrome</div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Добави към Нач. екран"</div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди „Инсталиране"</div></div></div></div>
       </div>
-      <div id="android-samsung-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни менюто ☰</div><div class="step-desc">Долу вдясно в Samsung Internet</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Избери „Добави страница към"</div><div class="step-desc">→ „Начален екран"</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди с „Добави"</div><div class="step-desc">Готово!</div></div></div></div>
-      </div>
-      <div id="desktop-steps" style="display:none">
-        <div class="desktop-msg"><div class="desktop-phone">📱</div><div class="desktop-title-d">Отвори от телефона си</div><div class="desktop-desc">Приложението е за мобилен телефон.<br>Отвори линка от Safari (iPhone) или Chrome (Android):</div><div class="desktop-url">alekpeev.github.io/maichin-organizur</div></div>
-      </div>
+      <div id="desktop-steps" style="display:none"><div class="desktop-msg"><div class="desktop-phone">📱</div><div class="desktop-title-d">Отвори от телефона си</div><div class="desktop-desc">Отвори линка от Safari (iPhone) или Chrome (Android)</div><div class="desktop-url">alekpeev.github.io/maichin-organizur</div></div></div>
     </div>
     <div class="skip-row"><button class="skip-btn" id="skip-btn">Продължи без инсталация →</button></div>
   </div>
@@ -164,15 +170,18 @@
 (function(){
   'use strict';
 
-  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUDssTmamQyK0g1Lz38JYmbWfASw6xLgmYdKqblvYHTj9b0RmB_Kib43lSq6GGGWiiNQ/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbwUDssTmamQyK0g1Lz38JYmbWfASw6xLgmYdKqblvYHTj9b0RmB_Kib43lSq6GGGWiiNQ/exec';
 
   var frame = document.getElementById('app-frame');
   var splash = document.getElementById('splash');
+  var splashSub = document.getElementById('splash-sub');
+  var splashDots = document.getElementById('splash-dots');
+  var loginBtn = document.getElementById('login-btn');
+  var loginNote = document.getElementById('login-note');
   var authOverlay = document.getElementById('auth-overlay');
   var authBtn = document.getElementById('auth-btn');
   var installLanding = document.getElementById('install-landing');
   var skipBtn = document.getElementById('skip-btn');
-  var isAuthed = false;
   var appLoaded = false;
 
   var ua = navigator.userAgent;
@@ -180,121 +189,107 @@
   var isAndroid = /android/i.test(ua);
   var isSafari = isIOS && /safari/i.test(ua) && !/crios|fxios|opios|edgios/i.test(ua);
   var isChromeIOS = isIOS && /crios/i.test(ua);
-  var isFirefoxIOS = isIOS && /fxios/i.test(ua);
   var isSamsungBrowser = isAndroid && /samsungbrowser/i.test(ua);
 
   var isStandalone = (window.navigator.standalone === true) ||
                      window.matchMedia('(display-mode: standalone)').matches;
 
   // ==========================================================
-  // STANDALONE MODE:
-  //   JSONP проверка дали е логнат в Google
-  //   Ако да → iframe зарежда директно (fullscreen, без URL лента)
-  //   Ако не → redirect към Apps Script за еднократен login
-  //            (ще покаже URL лента само този път)
-  //            след login, потребителят отваря от иконката отново
-  //            → вече е логнат → iframe работи → fullscreen
+  // AUTH PING-PONG PATTERN (от Gemini)
   //
-  // BROWSER MODE:
-  //   Landing page с инструкции за Add to Home Screen
-  //   "Продължи без инсталация" → JSONP + iframe
+  // STANDALONE:
+  //   1. JSONP check_auth → логнат ли е?
+  //   2. ДА → iframe зарежда → fullscreen ✅
+  //   3. НЕ → показваме "Вход с Google" бутон
+  //   4. Клик → window.location.href към GAS?pwa_auth=true
+  //   5. iOS отваря in-app browser → Google login
+  //   6. GAS redirect-ва ОБРАТНО към GitHub Pages
+  //   7. iOS затваря in-app browser → standalone се възстановява
+  //   8. Отново JSONP → логнат → iframe → fullscreen ✅
+  //
+  // BROWSER:
+  //   Landing page → install инструкции → или "Продължи"
   // ==========================================================
 
   if (isStandalone) {
-    splash.classList.add('show');
+    // --- STANDALONE MODE ---
     installLanding.style.display = 'none';
-
-    // Опитваме iframe ПЪРВО
-    // Ако потребителят е логнат → iframe зарежда Apps Script → fullscreen ✅
-    // Ако не е логнат → iframe зарежда 403 → redirect за login
-    frame.src = SCRIPT_URL;
-    frame.classList.add('visible');
-
-    frame.addEventListener('load', function onL() {
-      frame.removeEventListener('load', onL);
-
-      setTimeout(function() {
-        // Проверяваме дали iframe зареди cross-origin съдържание (Apps Script)
-        // или same-origin/error (403 от Google)
-        var isAppLoaded = false;
-        try {
-          // Ако iframe е cross-origin → този ред ще хвърли грешка → ДОБРЕ
-          var testUrl = frame.contentWindow.location.href;
-          // Ако НЕ хвърли грешка → same-origin → 403/грешка
-          // Redirect за login
-          window.location.href = SCRIPT_URL;
-        } catch(e) {
-          // Cross-origin грешка = Apps Script зареди успешно!
-          isAppLoaded = true;
-          appLoaded = true;
-          hideSplash();
-        }
-      }, 1500);
-    });
-
-    // Fallback: ако iframe не зареди за 8 сек → redirect
-    setTimeout(function() {
-      if (!appLoaded) {
-        window.location.href = SCRIPT_URL;
-      }
-    }, 8000);
-
+    checkAuth();
   } else {
-    // BROWSER MODE
+    // --- BROWSER MODE ---
     splash.style.display = 'none';
     showPlatformSteps();
     installLanding.classList.add('show');
   }
 
-  function showPlatformSteps() {
-    if (isIOS && isSafari) {
-      document.getElementById('ios-safari-steps').style.display = 'block';
-    } else if (isIOS && (isChromeIOS || isFirefoxIOS)) {
-      document.getElementById('ios-chrome-steps').style.display = 'block';
-    } else if (isIOS) {
-      document.getElementById('ios-chrome-steps').style.display = 'block';
-    } else if (isAndroid && isSamsungBrowser) {
-      document.getElementById('android-samsung-steps').style.display = 'block';
-    } else if (isAndroid) {
-      document.getElementById('android-chrome-steps').style.display = 'block';
-    } else {
-      document.getElementById('desktop-steps').style.display = 'block';
-    }
+  // === JSONP Auth Check ===
+  function checkAuth() {
+    var cbName = 'gasAuthCb_' + Math.round(Math.random() * 100000);
+    var resolved = false;
+    var script = document.createElement('script');
+
+    // Успех — потребителят е логнат
+    window[cbName] = function(data) {
+      if (resolved) return;
+      resolved = true;
+      delete window[cbName];
+      script.remove();
+
+      if (data && data.email) {
+        // ЛОГНАТ! Зареждаме iframe
+        loadApp();
+      } else {
+        // Празен email — не е логнат
+        showLoginButton();
+      }
+    };
+
+    // Грешка — Google връща HTML вместо JS
+    script.onerror = function() {
+      if (resolved) return;
+      resolved = true;
+      delete window[cbName];
+      script.remove();
+      showLoginButton();
+    };
+
+    // Timeout — 3 секунди
+    setTimeout(function() {
+      if (!resolved) {
+        resolved = true;
+        showLoginButton();
+      }
+    }, 3000);
+
+    script.src = GAS_URL + '?action=check_auth&callback=' + cbName;
+    document.body.appendChild(script);
   }
 
-  // "Продължи без инсталация"
-  skipBtn.addEventListener('click', function() {
-    installLanding.classList.remove('show');
-    installLanding.style.display = 'none';
-    splash.style.display = 'flex';
-    splash.classList.add('show');
-    splash.classList.remove('hide');
-    startBrowserAppFlow();
+  // === Показваме Login бутон ===
+  function showLoginButton() {
+    splashSub.textContent = 'Нужно е еднократно влизане';
+    splashDots.style.display = 'none';
+    loginBtn.style.display = 'block';
+    loginNote.style.display = 'block';
+  }
+
+  // === Auth Ping-Pong: redirect към GAS за login ===
+  loginBtn.addEventListener('click', function() {
+    // Redirect към Apps Script с pwa_auth=true
+    // GAS ще направи Google login, после redirect обратно към GitHub Pages
+    // iOS ще затвори in-app browser-а и ще възстанови standalone mode
+    window.location.href = GAS_URL + '?pwa_auth=true';
   });
 
-  // Browser mode app flow (JSONP + auth overlay ако трябва)
-  function startBrowserAppFlow() {
-    var s = document.createElement('script');
-    s.src = SCRIPT_URL + '?jsonpCallback=onAuthCheck';
-    s.onerror = function() { showAuth(); };
-    document.body.appendChild(s);
-    setTimeout(function() { if (!isAuthed && !appLoaded) showAuth(); }, 5000);
-  }
-
-  window.onAuthCheck = function(email) {
-    isAuthed = true;
-    loadApp();
-  };
-
+  // === Зареждаме iframe ===
   function loadApp() {
     if (appLoaded) return;
     appLoaded = true;
-    frame.src = SCRIPT_URL;
+    splashSub.textContent = 'Зарежда се...';
+    frame.src = GAS_URL;
     frame.classList.add('visible');
     frame.addEventListener('load', function onL() {
       frame.removeEventListener('load', onL);
-      // iframe зареди успешно → маркираме че потребителят е логнат
-      try { localStorage.setItem('mo_logged_in', 'yes'); } catch(e) {}
       setTimeout(hideSplash, 1500);
     });
     setTimeout(hideSplash, 12000);
@@ -306,14 +301,41 @@
     setTimeout(function() { splash.style.display = 'none'; }, 500);
   }
 
-  function showAuth() {
+  // === Browser mode functions ===
+  function showPlatformSteps() {
+    if (isIOS && isSafari) document.getElementById('ios-safari-steps').style.display = 'block';
+    else if (isIOS) document.getElementById('ios-chrome-steps').style.display = 'block';
+    else if (isAndroid) document.getElementById('android-chrome-steps').style.display = 'block';
+    else document.getElementById('desktop-steps').style.display = 'block';
+  }
+
+  skipBtn.addEventListener('click', function() {
+    installLanding.classList.remove('show');
+    installLanding.style.display = 'none';
+    splash.style.display = 'flex';
+    startBrowserAuth();
+  });
+
+  function startBrowserAuth() {
+    var s = document.createElement('script');
+    s.src = GAS_URL + '?action=check_auth&callback=onBrowserAuth';
+    s.onerror = function() { showBrowserAuth(); };
+    document.body.appendChild(s);
+    setTimeout(function() { if (!appLoaded) showBrowserAuth(); }, 5000);
+  }
+
+  window.onBrowserAuth = function(data) {
+    if (data && data.email) loadApp();
+    else showBrowserAuth();
+  };
+
+  function showBrowserAuth() {
     splash.style.display = 'none';
     authOverlay.style.display = 'flex';
   }
 
-  // Auth button (browser mode only)
   authBtn.addEventListener('click', function() {
-    var w = window.open(SCRIPT_URL + '?auth=1', '_blank');
+    var w = window.open(GAS_URL + '?auth=1', '_blank');
     authBtn.textContent = 'Чакам вход...';
     authBtn.disabled = true;
     var ci = setInterval(function() {
@@ -321,8 +343,6 @@
         clearInterval(ci);
         authOverlay.style.display = 'none';
         splash.style.display = 'flex';
-        splash.classList.add('show');
-        splash.classList.remove('hide');
         loadApp();
       }
     }, 500);
