@@ -270,11 +270,39 @@
   // ==========================================================
 
   if (isStandalone) {
-    // STANDALONE MODE — просто redirect към Apps Script
-    // iOS ще го отвори в in-app browser ВЪТРЕ в standalone PWA прозореца
-    // Google auth ще се случи там → после Apps Script зарежда приложението
-    // Standalone mode се ЗАПАЗВА — няма Safari ленти
-    window.location.href = SCRIPT_URL;
+    // STANDALONE MODE
+    // Зареждаме iframe → ако потребителят е логнат, работи
+    // Ако не (403) → показваме auth екран → login в in-app browser → reload
+    splash.classList.add('show');
+    installLanding.style.display = 'none';
+    
+    frame.src = SCRIPT_URL;
+    frame.classList.add('visible');
+    
+    // Слушаме дали iframe зареди
+    frame.addEventListener('load', function() {
+      // Даваме 2 сек за да се зареди съдържанието
+      setTimeout(function() {
+        try {
+          // Ако можем да прочетем URL = same-origin = 403 страница от Google
+          var url = frame.contentWindow.location.href;
+          // Ако стигнем тук без грешка = NOT cross-origin = вероятно 403
+          // Показваме auth
+          showStandaloneAuth();
+        } catch(e) {
+          // Cross-origin грешка = iframe зареди script.google.com успешно!
+          hideSplash();
+        }
+      }, 2000);
+    });
+    
+    // Fallback: ако нищо не стане за 6 сек
+    setTimeout(function() {
+      if (splash.style.display !== 'none' && splash.classList.contains('show')) {
+        showStandaloneAuth();
+      }
+    }, 6000);
+    
   } else {
     // BROWSER: показваме landing page с install инструкции
     splash.style.display = 'none';
