@@ -21,12 +21,8 @@
     :root{--pink:#F2A7C3;--pink-l:#FDE8F0;--pink-d:#D4688A;--cream:#FDF8F4;--mint:#A8D8C8;--mint-l:#E0F5EF;--lav:#C4B5E8;--lav-l:#EDE8FA;--text:#3D2B2B;--text-s:#8A6B6B;--text-xs:#B09898;--white:#fff}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{height:100%;height:100dvh;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased}
-
-    /* IFRAME */
     #app-frame{position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:none;display:none;z-index:1;background:var(--cream)}
     #app-frame.visible{display:block}
-
-    /* SPLASH */
     #splash{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:50;transition:opacity .5s,visibility .5s}
     #splash.show{display:flex}
     #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
@@ -39,8 +35,6 @@
     .splash-dots span:nth-child(3){animation-delay:.4s;background:var(--lav)}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
     @keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.2);opacity:1}}
-
-    /* AUTH */
     #auth-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:60;padding:32px;text-align:center}
     .auth-icon{width:90px;height:90px;border-radius:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(212,104,138,.2)}
     .auth-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--pink-d);margin-bottom:12px}
@@ -48,8 +42,6 @@
     .auth-btn{background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:15px 36px;border-radius:14px;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
     .auth-btn:active{transform:scale(.97)}
     .auth-note{font-size:.78rem;color:var(--text-xs);margin-top:16px;line-height:1.5}
-
-    /* INSTALL LANDING */
     #install-landing{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0 0%,#FDF8F4 40%,#E0F5EF 100%);display:none;z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch}
     #install-landing.show{display:block}
     .landing-inner{max-width:440px;margin:0 auto;padding:0 20px;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
@@ -64,16 +56,12 @@
     .install-cta{background:var(--white);border-radius:20px;padding:24px 20px;margin:24px 0;box-shadow:0 4px 20px rgba(61,43,43,.08);border:1.5px solid rgba(242,167,195,.2)}
     .cta-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--text);text-align:center;margin-bottom:16px}
     .cta-emoji{font-size:1.5rem;margin-right:6px;vertical-align:middle}
-
-    /* Steps */
     .install-step{background:var(--pink-l);border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(242,167,195,.15)}
     .step-row{display:flex;align-items:flex-start;gap:12px}
     .step-num{width:28px;height:28px;min-width:28px;background:var(--pink-d);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;margin-top:1px}
     .step-content{flex:1}
     .step-title{font-weight:600;font-size:.92rem;color:var(--text)}
     .step-desc{font-size:.8rem;color:var(--text-s);margin-top:2px}
-
-    /* Safari illustration */
     .safari-bar{margin-top:10px;background:#F5F5F5;border-radius:10px;padding:10px 14px;border:1px solid #E0E0E0}
     .safari-icons{display:flex;align-items:center;justify-content:space-around}
     .safari-icons span{font-size:1.1rem;color:#999}
@@ -82,8 +70,6 @@
     .share-dot{position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:#E53935;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:white}
     .bar-hint{text-align:center;font-size:.7rem;color:#007AFF;font-weight:600;margin-top:6px}
     @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(0,122,255,.3)}50%{box-shadow:0 0 0 8px rgba(0,122,255,0)}}
-
-    /* Menu illustrations */
     .menu-mock{margin-top:10px;background:white;border-radius:10px;border:1px solid #E0E0E0;overflow:hidden}
     .menu-item{padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:.8rem;color:#999;border-bottom:1px solid #F0F0F0}
     .menu-item.hl{background:rgba(0,122,255,.08);border:2px solid #007AFF;border-radius:8px;margin:3px;color:#007AFF;font-weight:600;border-bottom:2px solid #007AFF}
@@ -92,8 +78,6 @@
     .add-cancel{color:#007AFF;font-size:.82rem}
     .add-title-m{font-size:.82rem;font-weight:600;color:var(--text)}
     .add-btn-m{background:#007AFF;color:white;padding:5px 14px;border-radius:7px;font-size:.8rem;font-weight:600}
-
-    /* Chrome illustrations */
     .chrome-bar{margin-top:10px;background:#333;border-radius:10px;padding:10px 14px}
     .chrome-row{display:flex;align-items:center;gap:10px}
     .chrome-url{background:#444;border-radius:16px;padding:5px 12px;flex:1;font-size:.7rem;color:#999}
@@ -102,25 +86,19 @@
     .chrome-menu{margin-top:10px;background:#333;border-radius:10px;overflow:hidden}
     .chrome-mi{padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:.8rem;color:#ccc;border-bottom:1px solid #444}
     .chrome-mi.hl{background:rgba(76,175,80,.15);border:2px solid #4CAF50;border-radius:8px;margin:3px;color:#4CAF50;font-weight:600;border-bottom:2px solid #4CAF50}
-
-    /* Warning box */
     .warning-box{background:#FFF6D9;border:1.5px solid #F0B429;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:.84rem;color:#7A6000;line-height:1.5}
     .warning-box strong{color:#5D4800}
-
-    /* Desktop & other */
     .desktop-msg{background:var(--white);border-radius:20px;padding:32px 20px;text-align:center;box-shadow:0 4px 20px rgba(61,43,43,.08);border:1.5px solid rgba(242,167,195,.2);margin:0}
     .desktop-phone{font-size:3rem;margin-bottom:14px}
     .desktop-title-d{font-weight:600;font-size:1.05rem;color:var(--text)}
     .desktop-desc{font-size:.88rem;color:var(--text-s);margin-top:8px;line-height:1.5}
     .desktop-url{display:inline-block;margin-top:12px;background:var(--pink-l);padding:8px 16px;border-radius:10px;font-size:.85rem;font-weight:600;color:var(--pink-d)}
-
     .skip-row{text-align:center;margin-top:20px}
     .skip-btn{background:none;border:none;color:var(--text-s);font-size:.85rem;text-decoration:underline;cursor:pointer;font-family:'DM Sans',sans-serif;padding:10px 20px}
   </style>
 </head>
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
   <img src="icon-192.png" alt="Лого" class="splash-icon">
   <div class="splash-title">Майчин<br>Органайзър</div>
@@ -128,7 +106,6 @@
   <div class="splash-dots"><span></span><span></span><span></span></div>
 </div>
 
-<!-- AUTH -->
 <div id="auth-overlay">
   <img src="icon-192.png" alt="Лого" class="auth-icon">
   <div class="auth-title">Добре дошла!</div>
@@ -137,10 +114,8 @@
   <div class="auth-note">След като влезеш, върни се тук —<br>приложението ще се зареди.</div>
 </div>
 
-<!-- IFRAME -->
 <iframe id="app-frame" allow="camera;microphone"></iframe>
 
-<!-- INSTALL LANDING -->
 <div id="install-landing">
   <div class="landing-inner">
     <div class="landing-hero">
@@ -154,63 +129,33 @@
       <div class="feature-card"><div class="feature-icon">📏</div><div class="feature-name">Растеж</div></div>
       <div class="feature-card"><div class="feature-icon">📝</div><div class="feature-name">Бележки</div></div>
     </div>
-
     <div class="install-cta">
       <div class="cta-title"><span class="cta-emoji">📲</span> Запази на телефона си</div>
-
-      <!-- iOS Safari -->
       <div id="ios-safari-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни бутона „Сподели"</div><div class="step-desc">Долу в лентата на Safari</div>
-          <div class="safari-bar"><div class="safari-icons"><span>◀</span><span>▶</span><div class="share-btn"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div class="share-dot">!</div></div><span>📖</span><span>⧉</span></div><div class="bar-hint">↑ Натисни тук</div></div>
-        </div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Намери „Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div>
-          <div class="menu-mock"><div class="menu-item"><span>📋</span> Копирай</div><div class="menu-item"><span>🔖</span> Добави отметка</div><div class="menu-item hl"><span>➕</span> Към Начален екран</div></div>
-        </div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Горе вдясно — и готово!</div>
-          <div class="add-mock"><div class="add-row"><span class="add-cancel">Откажи</span><span class="add-title-m">Към Нач. екран</span><span class="add-btn-m">Добави</span></div></div>
-        </div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни бутона „Сподели"</div><div class="step-desc">Долу в лентата на Safari</div><div class="safari-bar"><div class="safari-icons"><span>◀</span><span>▶</span><div class="share-btn"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div class="share-dot">!</div></div><span>📖</span><span>⧉</span></div><div class="bar-hint">↑ Натисни тук</div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Намери „Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div><div class="menu-mock"><div class="menu-item"><span>📋</span> Копирай</div><div class="menu-item"><span>🔖</span> Добави отметка</div><div class="menu-item hl"><span>➕</span> Към Начален екран</div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Горе вдясно — и готово!</div><div class="add-mock"><div class="add-row"><span class="add-cancel">Откажи</span><span class="add-title-m">Към Нач. екран</span><span class="add-btn-m">Добави</span></div></div></div></div></div>
       </div>
-
-      <!-- iOS Chrome (needs Safari redirect) -->
       <div id="ios-chrome-steps" style="display:none">
-        <div class="warning-box">
-          <strong>⚠️ Използваш Chrome на iPhone.</strong><br>
-          За да запазиш приложението, трябва да го отвориш в <strong>Safari</strong> — само Safari поддържа „Добави към Нач. екран" на iPhone.
-        </div>
+        <div class="warning-box"><strong>⚠️ Използваш Chrome на iPhone.</strong><br>За да запазиш приложението, трябва да го отвориш в <strong>Safari</strong>.</div>
         <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Копирай линка</div><div class="step-desc">Натисни и задръж адресната лента → Копирай</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Отвори Safari</div><div class="step-desc">Постави линка в Safari и отвори</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Сподели" → „Към Нач. екран"</div><div class="step-desc">Следвай стъпките за Safari</div></div></div></div>
       </div>
-
-      <!-- Android Chrome -->
       <div id="android-chrome-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни менюто ⋮</div><div class="step-desc">Трите точки горе вдясно в Chrome</div>
-          <div class="chrome-bar"><div class="chrome-row"><div class="chrome-url">alekpeev.github.io</div><div class="chrome-dots">⋮<div class="share-dot">!</div></div></div><div class="chrome-hint">↑ Натисни тук</div></div>
-        </div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Избери „Добави към Нач. екран"</div><div class="step-desc">Или „Инсталиране на приложение"</div>
-          <div class="chrome-menu"><div class="chrome-mi"><span>⭐</span> Отметки</div><div class="chrome-mi hl"><span>📱</span> Добави към Нач. екран</div><div class="chrome-mi"><span>⚙️</span> Настройки</div></div>
-        </div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди с „Инсталиране"</div><div class="step-desc">И готово — Майчин Органайзър е на екрана ти!</div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни менюто ⋮</div><div class="step-desc">Трите точки горе вдясно в Chrome</div><div class="chrome-bar"><div class="chrome-row"><div class="chrome-url">alekpeev.github.io</div><div class="chrome-dots">⋮<div class="share-dot">!</div></div></div><div class="chrome-hint">↑ Натисни тук</div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Избери „Добави към Нач. екран"</div><div class="step-desc">Или „Инсталиране на приложение"</div><div class="chrome-menu"><div class="chrome-mi"><span>⭐</span> Отметки</div><div class="chrome-mi hl"><span>📱</span> Добави към Нач. екран</div><div class="chrome-mi"><span>⚙️</span> Настройки</div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди с „Инсталиране"</div><div class="step-desc">И готово!</div></div></div></div>
       </div>
-
-      <!-- Android Samsung Browser -->
       <div id="android-samsung-steps" style="display:none">
         <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни менюто ☰</div><div class="step-desc">Долу вдясно в Samsung Internet</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Избери „Добави страница към"</div><div class="step-desc">→ „Начален екран"</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди с „Добави"</div><div class="step-desc">Готово!</div></div></div></div>
       </div>
-
-      <!-- Desktop -->
       <div id="desktop-steps" style="display:none">
-        <div class="desktop-msg">
-          <div class="desktop-phone">📱</div>
-          <div class="desktop-title-d">Отвори от телефона си</div>
-          <div class="desktop-desc">Приложението е проектирано за мобилен телефон.<br>Отвори този линк от Safari (iPhone) или Chrome (Android):</div>
-          <div class="desktop-url">alekpeev.github.io/maichin-organizur</div>
-        </div>
+        <div class="desktop-msg"><div class="desktop-phone">📱</div><div class="desktop-title-d">Отвори от телефона си</div><div class="desktop-desc">Приложението е за мобилен телефон.<br>Отвори линка от Safari (iPhone) или Chrome (Android):</div><div class="desktop-url">alekpeev.github.io/maichin-organizur</div></div>
       </div>
     </div>
-
     <div class="skip-row"><button class="skip-btn" id="skip-btn">Продължи без инсталация →</button></div>
   </div>
 </div>
@@ -230,81 +175,66 @@
   var isAuthed = false;
   var appLoaded = false;
 
-  // ===== DETECT PLATFORM + BROWSER =====
   var ua = navigator.userAgent;
-  var uaLower = ua.toLowerCase();
-
-  // iOS = iPhone/iPad/iPod (включва ВСИЧКИ браузъри на iOS — те всички ползват WebKit)
   var isIOS = /iphone|ipad|ipod/i.test(ua);
-
-  // Android
   var isAndroid = /android/i.test(ua);
-
-  // Мобилен
-  var isMobile = isIOS || isAndroid;
-
-  // Конкретен браузър
   var isSafari = isIOS && /safari/i.test(ua) && !/crios|fxios|opios|edgios/i.test(ua);
   var isChromeIOS = isIOS && /crios/i.test(ua);
   var isFirefoxIOS = isIOS && /fxios/i.test(ua);
-  var isChromeAndroid = isAndroid && /chrome/i.test(ua) && !/samsungbrowser|edg/i.test(ua);
   var isSamsungBrowser = isAndroid && /samsungbrowser/i.test(ua);
 
-  // Standalone mode (от Home Screen)
   var isStandalone = (window.navigator.standalone === true) ||
                      window.matchMedia('(display-mode: standalone)').matches;
 
   // ==========================================================
-  // ОСНОВНА ЛОГИКА:
+  // STANDALONE MODE:
+  //   JSONP проверка дали е логнат в Google
+  //   Ако да → iframe зарежда директно (fullscreen, без URL лента)
+  //   Ако не → redirect към Apps Script за еднократен login
+  //            (ще покаже URL лента само този път)
+  //            след login, потребителят отваря от иконката отново
+  //            → вече е логнат → iframe работи → fullscreen
   //
-  // STANDALONE (отворено от Home Screen):
-  //   → Splash → auth → load iframe → скрий splash
-  //   (iframe НЕ се зарежда преди standalone check)
-  //
-  // BROWSER (отворено от Safari/Chrome/друг):
-  //   → Показваме landing page с инструкции
-  //   → iframe НЕ се зарежда
-  //   → Потребителят натиска "Add to Home Screen" на ТАЗИ страница
-  //   → Origin = GitHub Pages → иконка + standalone работят
-  //   → "Продължи без инсталация" зарежда iframe
+  // BROWSER MODE:
+  //   Landing page с инструкции за Add to Home Screen
+  //   "Продължи без инсталация" → JSONP + iframe
   // ==========================================================
 
   if (isStandalone) {
-    // STANDALONE MODE
-    // Зареждаме iframe → ако потребителят е логнат, работи
-    // Ако не (403) → показваме auth екран → login в in-app browser → reload
     splash.classList.add('show');
     installLanding.style.display = 'none';
-    
-    frame.src = SCRIPT_URL;
-    frame.classList.add('visible');
-    
-    // Слушаме дали iframe зареди
-    frame.addEventListener('load', function() {
-      // Даваме 2 сек за да се зареди съдържанието
-      setTimeout(function() {
-        try {
-          // Ако можем да прочетем URL = same-origin = 403 страница от Google
-          var url = frame.contentWindow.location.href;
-          // Ако стигнем тук без грешка = NOT cross-origin = вероятно 403
-          // Показваме auth
-          showStandaloneAuth();
-        } catch(e) {
-          // Cross-origin грешка = iframe зареди script.google.com успешно!
-          hideSplash();
-        }
-      }, 2000);
-    });
-    
-    // Fallback: ако нищо не стане за 6 сек
-    setTimeout(function() {
-      if (splash.style.display !== 'none' && splash.classList.contains('show')) {
-        showStandaloneAuth();
+
+    // JSONP проверка
+    var jsonp = document.createElement('script');
+    jsonp.src = SCRIPT_URL + '?jsonpCallback=onStandaloneAuth';
+    jsonp.onerror = function() {
+      // Не е логнат → redirect за login
+      // Ще покаже URL лента САМО този път
+      // След login, от иконката → iframe → fullscreen
+      window.location.href = SCRIPT_URL;
+    };
+    document.body.appendChild(jsonp);
+
+    window.onStandaloneAuth = function(email) {
+      if (email) {
+        // Логнат е! Зареждаме iframe — fullscreen, без URL лента
+        isAuthed = true;
+        loadApp();
+      } else {
+        // Празен email = не е логнат
+        window.location.href = SCRIPT_URL;
       }
-    }, 6000);
-    
+    };
+
+    // Fallback: ако JSONP не отговори за 3 сек → redirect
+    setTimeout(function() {
+      if (!isAuthed && !appLoaded) {
+        window.location.href = SCRIPT_URL;
+      }
+    }, 3000);
+
   } else {
-    // BROWSER: показваме landing page с install инструкции
+    // BROWSER MODE
     splash.style.display = 'none';
     showPlatformSteps();
     installLanding.classList.add('show');
@@ -312,22 +242,16 @@
 
   function showPlatformSteps() {
     if (isIOS && isSafari) {
-      // Safari на iPhone — стандартен install flow
       document.getElementById('ios-safari-steps').style.display = 'block';
     } else if (isIOS && (isChromeIOS || isFirefoxIOS)) {
-      // Chrome/Firefox на iPhone — НЕ поддържат standalone
       document.getElementById('ios-chrome-steps').style.display = 'block';
     } else if (isIOS) {
-      // Друг браузър на iOS — показваме Safari стъпки + warning
       document.getElementById('ios-chrome-steps').style.display = 'block';
     } else if (isAndroid && isSamsungBrowser) {
-      // Samsung Internet
       document.getElementById('android-samsung-steps').style.display = 'block';
     } else if (isAndroid) {
-      // Chrome на Android (или друг Android браузър)
       document.getElementById('android-chrome-steps').style.display = 'block';
     } else {
-      // Desktop
       document.getElementById('desktop-steps').style.display = 'block';
     }
   }
@@ -339,11 +263,11 @@
     splash.style.display = 'flex';
     splash.classList.add('show');
     splash.classList.remove('hide');
-    startAppFlow();
+    startBrowserAppFlow();
   });
 
-  // ===== APP FLOW =====
-  function startAppFlow() {
+  // Browser mode app flow (JSONP + auth overlay ако трябва)
+  function startBrowserAppFlow() {
     var s = document.createElement('script');
     s.src = SCRIPT_URL + '?jsonpCallback=onAuthCheck';
     s.onerror = function() { showAuth(); };
@@ -353,13 +277,6 @@
 
   window.onAuthCheck = function(email) {
     isAuthed = true;
-    loadApp();
-  };
-
-  // Callback за standalone JSONP проверка
-  window.onStandaloneAuth = function(email) {
-    isAuthed = true;
-    // Логнат е! Зареждаме iframe
     loadApp();
   };
 
@@ -385,33 +302,8 @@
     splash.style.display = 'none';
     authOverlay.style.display = 'flex';
   }
-  
-  // Специален auth за standalone mode
-  // НЕ използва window.open (чупи standalone)
-  // Вместо това: покажи линк за login в in-app browser
-  function showStandaloneAuth() {
-    splash.style.display = 'none';
-    frame.style.display = 'none';
-    
-    // Създаваме standalone auth UI
-    var saDiv = document.createElement('div');
-    saDiv.style.cssText = 'position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:70;padding:32px;text-align:center;';
-    saDiv.innerHTML = '<img src="icon-192.png" alt="Лого" style="width:90px;height:90px;border-radius:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(212,104,138,.2)">'
-      + '<div style="font-family:Playfair Display,serif;font-size:1.4rem;color:#D4688A;margin-bottom:12px">Добре дошла!</div>'
-      + '<div style="font-size:.95rem;color:#8A6B6B;margin-bottom:28px;line-height:1.6">За да използваш приложението,<br>трябва да влезеш с Google акаунта си.</div>'
-      + '<a href="' + SCRIPT_URL + '?auth=1" target="_blank" style="background:linear-gradient(135deg,#F2A7C3,#D4688A);color:white;text-decoration:none;padding:15px 36px;border-radius:14px;font-size:1.05rem;font-weight:600;display:inline-block;box-shadow:0 6px 20px rgba(212,104,138,.35);font-family:DM Sans,sans-serif">Вход с Google</a>'
-      + '<div style="font-size:.78rem;color:#B09898;margin-top:16px;line-height:1.5">След като влезеш в Google,<br>натисни бутона отдолу.</div>'
-      + '<button id="sa-reload-btn" style="margin-top:20px;background:#A8D8C8;color:white;border:none;padding:14px 32px;border-radius:14px;font-size:1rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;box-shadow:0 4px 12px rgba(168,216,200,.4)">🔄 Зареди приложението</button>';
-    document.body.appendChild(saDiv);
-    
-    document.getElementById('sa-reload-btn').addEventListener('click', function() {
-      // Презареждаме страницата — standalone mode се запазва
-      // Този път потребителят вече е логнат → iframe ще зареди
-      window.location.reload();
-    });
-  }
 
-  // AUTH BUTTON
+  // Auth button (browser mode only)
   authBtn.addEventListener('click', function() {
     var w = window.open(SCRIPT_URL + '?auth=1', '_blank');
     authBtn.textContent = 'Чакам вход...';
@@ -429,7 +321,6 @@
     setTimeout(function() { clearInterval(ci); authBtn.textContent = 'Вход с Google'; authBtn.disabled = false; }, 120000);
   });
 
-  // SERVICE WORKER
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function() {});
   }
