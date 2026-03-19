@@ -3,7 +3,7 @@
   "short_name": "Органайзър",
   "description": "Всичко за бебето на едно място — ваксини, растеж, хранене, спомени и още.",
   "start_url": "/maichin-organizur/",
-  "scope": "/maichin-organizur/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#FDF8F4",
