@@ -25,7 +25,7 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{height:100%;height:100dvh;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased}
 
-    /* IFRAME */
+    /* IFRAME — КЛЮЧОВО: заема целия екран */
     #app-frame{position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:none;display:none;z-index:1;background:var(--cream)}
     #app-frame.visible{display:block}
 
@@ -88,11 +88,6 @@
     .menu-mock{margin-top:10px;background:white;border-radius:10px;border:1px solid #E0E0E0;overflow:hidden}
     .menu-item{padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:.8rem;color:#999;border-bottom:1px solid #F0F0F0}
     .menu-item.hl{background:rgba(0,122,255,.08);border:2px solid #007AFF;border-radius:8px;margin:3px;color:#007AFF;font-weight:600;border-bottom:2px solid #007AFF}
-    .add-mock{margin-top:10px;background:#F5F5F5;border-radius:10px;padding:10px 14px;border:1px solid #E0E0E0}
-    .add-row{display:flex;align-items:center;justify-content:space-between}
-    .add-cancel{color:#007AFF;font-size:.82rem}
-    .add-title-m{font-size:.82rem;font-weight:600;color:var(--text)}
-    .add-btn-m{background:#007AFF;color:white;padding:5px 14px;border-radius:7px;font-size:.8rem;font-weight:600}
     .chrome-bar{margin-top:10px;background:#333;border-radius:10px;padding:10px 14px}
     .chrome-row{display:flex;align-items:center;gap:10px}
     .chrome-url{background:#444;border-radius:16px;padding:5px 12px;flex:1;font-size:.7rem;color:#999}
@@ -174,6 +169,7 @@
   'use strict';
 
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbwUDssTmamQyK0g1Lz38JYmbWfASw6xLgmYdKqblvYHTj9b0RmB_Kib43lSq6GGGWiiNQ/exec';
+  var PWA_URL = 'https://alekpeev.github.io/maichin-organizur/';
 
   var frame = document.getElementById('app-frame');
   var splash = document.getElementById('splash');
@@ -192,26 +188,30 @@
   var isAndroid = /android/i.test(ua);
   var isSafari = isIOS && /safari/i.test(ua) && !/crios|fxios|opios|edgios/i.test(ua);
   var isChromeIOS = isIOS && /crios/i.test(ua);
-  var isSamsungBrowser = isAndroid && /samsungbrowser/i.test(ua);
 
   var isStandalone = (window.navigator.standalone === true) ||
                      window.matchMedia('(display-mode: standalone)').matches;
 
   // ==========================================================
-  // AUTH PING-PONG PATTERN (от Gemini)
+  // ПОДОБРЕН AUTH PING-PONG
   //
-  // STANDALONE:
+  // КЛЮЧОВА ПРОМЯНА: НЕ зареждаме iframe преди да знаем
+  // че потребителят е логнат! Това предотвратява cross-origin
+  // redirect който чупи standalone mode на iOS.
+  //
+  // STANDALONE FLOW:
   //   1. JSONP check_auth → логнат ли е?
-  //   2. ДА → iframe зарежда → fullscreen ✅
+  //   2. ДА → ТОГАВА зареждаме iframe → fullscreen ✅
   //   3. НЕ → показваме "Вход с Google" бутон
   //   4. Клик → window.location.href към GAS?pwa_auth=true
-  //   5. iOS отваря in-app browser → Google login
-  //   6. GAS redirect-ва ОБРАТНО към GitHub Pages
-  //   7. iOS затваря in-app browser → standalone се възстановява
-  //   8. Отново JSONP → логнат → iframe → fullscreen ✅
+  //   5. GAS прави Google login + redirect ОБРАТНО към PWA URL
+  //   6. iOS вижда navigation обратно към PWA scope →
+  //      затваря in-app browser → standalone се възстановява
+  //   7. Отново checkAuth() → логнат → iframe → fullscreen ✅
   //
-  // BROWSER:
+  // BROWSER FLOW:
   //   Landing page → install инструкции → или "Продължи"
+  //   → auth check → login в нов таб → reload → iframe
   // ==========================================================
 
   if (isStandalone) {
@@ -225,16 +225,14 @@
     installLanding.classList.add('show');
   }
 
-  // === JSONP Auth Check + ПАРАЛЕЛНО preload на iframe ===
+  // === JSONP Auth Check (БЕЗ предварително зареждане на iframe!) ===
   function checkAuth() {
     var cbName = 'gasAuthCb_' + Math.round(Math.random() * 100000);
     var resolved = false;
     var script = document.createElement('script');
 
-    // ПАРАЛЕЛНО: започваме да зареждаме iframe още сега
-    // Ако потребителят е логнат, iframe ще е готов по-бързо
-    frame.src = GAS_URL;
-    frame.classList.add('visible');
+    // ВАЖНО: НЕ зареждаме iframe тук! Първо проверяваме auth.
+    splashSub.textContent = 'Проверка на профила...';
 
     // Успех — потребителят е логнат
     window[cbName] = function(data) {
@@ -244,44 +242,30 @@
       script.remove();
 
       if (data && data.email) {
-        // ЛОГНАТ! iframe вече се зарежда паралелно
-        appLoaded = true;
-        splashSub.textContent = 'Зарежда се...';
-        // Чакаме iframe да зареди
-        frame.addEventListener('load', function onL() {
-          frame.removeEventListener('load', onL);
-          setTimeout(hideSplash, 400);
-        });
-        // Fallback
-        setTimeout(hideSplash, 10000);
+        // ЛОГНАТ! Сега е безопасно да заредим iframe
+        loadApp();
       } else {
-        // Празен email — не е логнат, спираме iframe
-        frame.src = 'about:blank';
-        frame.classList.remove('visible');
+        // Празен email — не е логнат
         showLoginButton();
       }
     };
 
-    // Грешка — Google връща HTML вместо JS
+    // Грешка — Google връща HTML вместо JS (не е логнат)
     script.onerror = function() {
       if (resolved) return;
       resolved = true;
       delete window[cbName];
       script.remove();
-      frame.src = 'about:blank';
-      frame.classList.remove('visible');
       showLoginButton();
     };
 
-    // Timeout — 3 секунди
+    // Timeout — 5 секунди (увеличен от 3 за бавни връзки)
     setTimeout(function() {
       if (!resolved) {
         resolved = true;
-        frame.src = 'about:blank';
-        frame.classList.remove('visible');
         showLoginButton();
       }
-    }, 3000);
+    }, 5000);
 
     script.src = GAS_URL + '?action=check_auth&callback=' + cbName;
     document.body.appendChild(script);
@@ -297,24 +281,32 @@
 
   // === Auth Ping-Pong: redirect към GAS за login ===
   loginBtn.addEventListener('click', function() {
-    // Redirect към Apps Script с pwa_auth=true
-    // GAS ще направи Google login, после redirect обратно към GitHub Pages
+    // STANDALONE: redirect към Apps Script с pwa_auth=true
+    // GAS ще направи Google login, после redirect ОБРАТНО към PWA URL
     // iOS ще затвори in-app browser-а и ще възстанови standalone mode
+    splashSub.textContent = 'Пренасочване към Google...';
+    splashDots.style.display = 'flex';
+    loginBtn.style.display = 'none';
+    loginNote.style.display = 'none';
     window.location.href = GAS_URL + '?pwa_auth=true';
   });
 
-  // === Зареждаме iframe ===
+  // === Зареждаме iframe САМО когато потребителят е логнат ===
   function loadApp() {
     if (appLoaded) return;
     appLoaded = true;
     splashSub.textContent = 'Зарежда се...';
+
     frame.src = GAS_URL;
     frame.classList.add('visible');
+
     frame.addEventListener('load', function onL() {
       frame.removeEventListener('load', onL);
       setTimeout(hideSplash, 400);
     });
-    setTimeout(hideSplash, 10000);
+
+    // Fallback timeout — ако iframe зареди бавно
+    setTimeout(hideSplash, 12000);
   }
 
   function hideSplash() {
