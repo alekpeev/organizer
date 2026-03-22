@@ -32,7 +32,7 @@
     #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
     .splash-icon{width:110px;height:110px;border-radius:26px;box-shadow:0 8px 32px rgba(212,104,138,.25);margin-bottom:20px;animation:pulse 2s ease-in-out infinite}
     .splash-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--pink-d);text-align:center;line-height:1.2}
-    .splash-sub{color:var(--text-s);font-size:.9rem;margin-top:10px;transition:opacity .3s}
+    .splash-sub{color:var(--text-s);font-size:.9rem;margin-top:10px;transition:opacity .3s;text-align:center;padding:0 20px}
     .splash-dots{display:flex;gap:7px;margin-top:24px}
     .splash-dots span{width:9px;height:9px;border-radius:50%;background:var(--pink);animation:dot 1.2s ease infinite}
     .splash-dots span:nth-child(2){animation-delay:.2s;background:var(--mint)}
@@ -42,7 +42,7 @@
 
     #login-btn{display:none;margin-top:28px;background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:16px 40px;border-radius:16px;font-size:1.1rem;font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
     #login-btn:active{transform:scale(.96)}
-    #login-note{display:none;font-size:.78rem;color:var(--text-xs);margin-top:14px;line-height:1.5;text-align:center}
+    #login-note{display:none;font-size:.82rem;color:var(--text-s);margin-top:14px;line-height:1.5;text-align:center;padding:0 20px}
 
     #auth-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:60;padding:32px;text-align:center}
     .auth-icon{width:90px;height:90px;border-radius:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(212,104,138,.2)}
@@ -108,9 +108,9 @@
 <div id="auth-overlay">
   <img src="icon-192.png" alt="Лого" class="auth-icon">
   <div class="auth-title">Добре дошла!</div>
-  <div class="auth-desc">За да използваш приложението, трябва да влезеш с Google акаунта си.<br>Натисни бутона — ще те пренасочим за вход.</div>
+  <div class="auth-desc">За да използваш приложението, трябва да влезеш с Google акаунта си.</div>
   <button class="auth-btn" id="auth-btn">Вход с Google</button>
-  <div class="auth-note">След вход ще се върнеш автоматично<br>към приложението.</div>
+  <div class="auth-note">Ще се отвори прозорец за вход.<br>След това се върни тук.</div>
 </div>
 
 <iframe id="app-frame" allow="camera;microphone"></iframe>
@@ -131,8 +131,8 @@
     <div class="install-cta">
       <div class="cta-title"><span class="cta-emoji">📲</span> Запази на телефона си</div>
       <div id="ios-safari-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни „Сподели"</div><div class="step-desc">Долу в лентата на Safari</div><div class="safari-bar"><div class="safari-icons"><span>◀</span><span>▶</span><div class="share-btn"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><div class="share-dot">!</div></div><span>📖</span><span>⧉</span></div><div class="bar-hint">↑ Натисни тук</div></div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div><div class="menu-mock"><div class="menu-item"><span>📋</span> Копирай</div><div class="menu-item hl"><span>➕</span> Към Начален екран</div></div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни „Сподели"</div><div class="step-desc">Долу в лентата на Safari</div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Горе вдясно — готово!</div></div></div></div>
       </div>
       <div id="ios-chrome-steps" style="display:none"><div class="warning-box"><strong>⚠️ Отвори в Safari</strong> — само Safari поддържа „Към Нач. екран" на iPhone.</div></div>
@@ -164,6 +164,7 @@
   var installLanding = document.getElementById('install-landing');
   var skipBtn = document.getElementById('skip-btn');
   var appLoaded = false;
+  var authPhase = 'initial'; // 'initial' | 'waiting' | 'checking'
 
   var ua = navigator.userAgent;
   var isIOS = /iphone|ipad|ipod/i.test(ua);
@@ -174,24 +175,19 @@
                      window.matchMedia('(display-mode: standalone)').matches;
 
   // ==========================================================
-  // МЕТОД "ПЪЛЕН КРЪГ" (Full Circle Auth)
+  // ХИБРИДЕН POPUP + РЪЧЕН БУТОН
   //
-  // Навигираме ЦЯЛОТО PWA към Google за логин.
-  // Бисквитката се запазва в контекста на самото PWA!
-  // После потребителят натиска бутон и се връща обратно.
-  //
-  // STANDALONE FLOW:
-  //   1. JSONP check_auth → логнат ли е?
-  //   2. ДА → iframe зарежда → fullscreen ✅
-  //   3. НЕ → показваме "Вход с Google" бутон
-  //   4. Клик → window.location.href към GAS?pwa_auth=true
-  //   5. Цялото PWA отива на script.google.com
-  //   6. Google прави логин + permissions
-  //   7. GAS показва "Готово! Към Органайзъра ➔" бутон
-  //   8. Потребителят натиска → href към github.io PWA URL
-  //   9. PWA се зарежда отново, checkAuth() → логнат! → iframe ✅
-  //
-  // Бисквитката е в контекста на PWA → работи с ITP!
+  // 1. JSONP check_auth → логнат ли е?
+  // 2. ДА → iframe → fullscreen ✅
+  // 3. НЕ → бутон "Вход с Google"
+  // 4. Клик → window.open(GAS?pwa_auth=true) → POPUP
+  //    PWA остава в standalone! Не навигираме никъде.
+  // 5. Потребителят се логва в popup-а + дава permissions
+  // 6. Popup показва "Готово! Натисни Done/X"
+  // 7. Потребителят затваря popup-а ръчно
+  // 8. В PWA-то бутонът вече е "🔄 Вече влязох"
+  // 9. Натиска → checkAuth() → JSONP с first-party credit
+  // 10. Логнат → iframe → fullscreen ✅
   // ==========================================================
 
   if (isStandalone) {
@@ -246,24 +242,51 @@
     document.body.appendChild(script);
   }
 
+  // === Показваме Login бутон ===
   function showLoginButton() {
-    splashSub.textContent = 'Нужно е еднократно влизане';
     splashDots.style.display = 'none';
+
+    if (authPhase === 'initial') {
+      splashSub.textContent = 'Нужно е еднократно влизане';
+      loginBtn.textContent = 'Вход с Google';
+      loginBtn.disabled = false;
+    } else if (authPhase === 'waiting') {
+      splashSub.textContent = 'Влез в Google в отворения прозорец.\nСлед това натисни бутона долу.';
+      loginBtn.textContent = '🔄 Вече влязох (Продължи)';
+      loginBtn.disabled = false;
+    }
+
     loginBtn.style.display = 'block';
     loginNote.style.display = 'block';
   }
 
-  // === STANDALONE: Директна навигация за логин (БЕЗ popup!) ===
-  // Цялото PWA отива на GAS → логин → бутон "Към Органайзъра" → обратно
-  // Бисквитката остава в контекста на PWA!
+  // === STANDALONE: Popup за логин ===
   loginBtn.addEventListener('click', function() {
-    splashSub.textContent = 'Пренасочване към Google...';
-    loginBtn.textContent = 'Зареждане...';
-    loginBtn.disabled = true;
-    splashDots.style.display = 'flex';
-    loginNote.style.display = 'none';
+    if (authPhase === 'initial') {
+      // СТЪПКА 1: Отваряме popup за логин
+      authPhase = 'waiting';
+      window.open(GAS_URL + '?pwa_auth=true', '_blank');
 
-    window.location.href = GAS_URL + '?pwa_auth=true';
+      // Сменяме бутона на "Вече влязох"
+      splashSub.textContent = 'Влез в Google в отворения прозорец.\nСлед това се върни тук и натисни бутона.';
+      loginBtn.textContent = '🔄 Вече влязох (Продължи)';
+      loginNote.innerHTML = 'След като видиш "✅ Входът е успешен",<br>затвори прозореца и натисни бутона горе.';
+
+    } else if (authPhase === 'waiting') {
+      // СТЪПКА 2: Потребителят е натиснал "Вече влязох"
+      // Проверяваме отново — user-initiated gesture!
+      authPhase = 'checking';
+      splashSub.textContent = 'Проверка след вход...';
+      splashDots.style.display = 'flex';
+      loginBtn.style.display = 'none';
+      loginNote.style.display = 'none';
+
+      // Малко забавяне за сесията да се установи
+      setTimeout(function() {
+        authPhase = 'initial'; // Reset за следващ опит ако не успее
+        checkAuth();
+      }, 800);
+    }
   });
 
   // === Зареждаме iframe САМО когато е логнат ===
@@ -322,9 +345,18 @@
     authOverlay.style.display = 'flex';
   }
 
-  // === BROWSER MODE: Също директна навигация ===
+  // === BROWSER MODE: Също popup + ръчен бутон ===
   authBtn.addEventListener('click', function() {
-    window.location.href = GAS_URL + '?pwa_auth=true';
+    window.open(GAS_URL + '?pwa_auth=true', '_blank');
+    authBtn.textContent = '🔄 Вече влязох';
+    authBtn.removeEventListener('click', arguments.callee);
+    authBtn.addEventListener('click', function() {
+      authOverlay.style.display = 'none';
+      splash.style.display = 'flex';
+      splashSub.textContent = 'Проверка след вход...';
+      splashDots.style.display = 'flex';
+      setTimeout(function() { checkAuth(); }, 800);
+    });
   });
 
   if ('serviceWorker' in navigator) {
