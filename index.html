@@ -25,7 +25,7 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{height:100%;height:100dvh;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased}
 
-    /* IFRAME — КЛЮЧОВО: заема целия екран */
+    /* IFRAME */
     #app-frame{position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:none;display:none;z-index:1;background:var(--cream)}
     #app-frame.visible{display:block}
 
@@ -42,7 +42,7 @@
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
     @keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.2);opacity:1}}
 
-    /* LOGIN BUTTON (показва се в splash при нелогнат) */
+    /* LOGIN BUTTON */
     #login-btn{display:none;margin-top:28px;background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:16px 40px;border-radius:16px;font-size:1.1rem;font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
     #login-btn:active{transform:scale(.96)}
     #login-note{display:none;font-size:.78rem;color:var(--text-xs);margin-top:14px;line-height:1.5;text-align:center}
@@ -169,7 +169,6 @@
   'use strict';
 
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbwUDssTmamQyK0g1Lz38JYmbWfASw6xLgmYdKqblvYHTj9b0RmB_Kib43lSq6GGGWiiNQ/exec';
-  var PWA_URL = 'https://alekpeev.github.io/maichin-organizur/';
 
   var frame = document.getElementById('app-frame');
   var splash = document.getElementById('splash');
@@ -193,25 +192,27 @@
                      window.matchMedia('(display-mode: standalone)').matches;
 
   // ==========================================================
-  // ПОДОБРЕН AUTH PING-PONG
+  // AUTH С WINDOW.OPEN (POPUP) ПОДХОД
   //
-  // КЛЮЧОВА ПРОМЯНА: НЕ зареждаме iframe преди да знаем
-  // че потребителят е логнат! Това предотвратява cross-origin
-  // redirect който чупи standalone mode на iOS.
+  // Решава два проблема:
+  // 1. Standalone mode се запазва — PWA никога не напуска scope-а
+  // 2. Safari ITP се заобикаля — потребителят взаимодейства
+  //    директно с script.google.com в popup, което създава
+  //    "first-party interaction" и Safari пуска cookies-ите
   //
   // STANDALONE FLOW:
   //   1. JSONP check_auth → логнат ли е?
-  //   2. ДА → ТОГАВА зареждаме iframe → fullscreen ✅
+  //   2. ДА → iframe зарежда → fullscreen ✅
   //   3. НЕ → показваме "Вход с Google" бутон
-  //   4. Клик → window.location.href към GAS?pwa_auth=true
-  //   5. GAS прави Google login + redirect ОБРАТНО към PWA URL
-  //   6. iOS вижда navigation обратно към PWA scope →
-  //      затваря in-app browser → standalone се възстановява
-  //   7. Отново checkAuth() → логнат → iframe → fullscreen ✅
+  //   4. Клик → window.open(GAS?pwa_auth=true) → POPUP
+  //   5. Потребителят се логва в popup-а + дава permissions
+  //   6. Popup-ът показва "Готово!" и се затваря (авто или с X)
+  //   7. PWA засича че popup е затворен → checkAuth() отново
+  //   8. JSONP → логнат → iframe → fullscreen ✅
   //
   // BROWSER FLOW:
   //   Landing page → install инструкции → или "Продължи"
-  //   → auth check → login в нов таб → reload → iframe
+  //   → auth check → login в popup → reload → iframe
   // ==========================================================
 
   if (isStandalone) {
@@ -225,14 +226,16 @@
     installLanding.classList.add('show');
   }
 
-  // === JSONP Auth Check (БЕЗ предварително зареждане на iframe!) ===
+  // === JSONP Auth Check ===
   function checkAuth() {
     var cbName = 'gasAuthCb_' + Math.round(Math.random() * 100000);
     var resolved = false;
     var script = document.createElement('script');
 
-    // ВАЖНО: НЕ зареждаме iframe тук! Първо проверяваме auth.
     splashSub.textContent = 'Проверка на профила...';
+    splashDots.style.display = 'flex';
+    loginBtn.style.display = 'none';
+    loginNote.style.display = 'none';
 
     // Успех — потребителят е логнат
     window[cbName] = function(data) {
@@ -242,15 +245,15 @@
       script.remove();
 
       if (data && data.email) {
-        // ЛОГНАТ! Сега е безопасно да заредим iframe
+        // ЛОГНАТ! Зареждаме iframe
         loadApp();
       } else {
-        // Празен email — не е логнат
+        // Не е логнат
         showLoginButton();
       }
     };
 
-    // Грешка — Google връща HTML вместо JS (не е логнат)
+    // Грешка
     script.onerror = function() {
       if (resolved) return;
       resolved = true;
@@ -259,13 +262,13 @@
       showLoginButton();
     };
 
-    // Timeout — 5 секунди (увеличен от 3 за бавни връзки)
+    // Timeout — 6 секунди
     setTimeout(function() {
       if (!resolved) {
         resolved = true;
         showLoginButton();
       }
-    }, 5000);
+    }, 6000);
 
     script.src = GAS_URL + '?action=check_auth&callback=' + cbName;
     document.body.appendChild(script);
@@ -279,16 +282,41 @@
     loginNote.style.display = 'block';
   }
 
-  // === Auth Ping-Pong: redirect към GAS за login ===
+  // === STANDALONE: Login чрез POPUP (window.open) ===
+  // PWA-то НИКОГА не напуска scope-а → standalone се запазва!
   loginBtn.addEventListener('click', function() {
-    // STANDALONE: redirect към Apps Script с pwa_auth=true
-    // GAS ще направи Google login, после redirect ОБРАТНО към PWA URL
-    // iOS ще затвори in-app browser-а и ще възстанови standalone mode
-    splashSub.textContent = 'Пренасочване към Google...';
-    splashDots.style.display = 'flex';
-    loginBtn.style.display = 'none';
+    splashSub.textContent = 'Чакам вход...';
+    loginBtn.textContent = 'Вход в ход...';
+    loginBtn.disabled = true;
     loginNote.style.display = 'none';
-    window.location.href = GAS_URL + '?pwa_auth=true';
+
+    // Отваряме GAS в POPUP — не с redirect!
+    var authWindow = window.open(GAS_URL + '?pwa_auth=true', '_blank');
+
+    // Следим кога popup-ът ще се затвори
+    var checkWindowInterval = setInterval(function() {
+      if (authWindow && authWindow.closed) {
+        clearInterval(checkWindowInterval);
+
+        // Popup-ът е затворен — проверяваме отново дали сме логнати
+        splashSub.textContent = 'Проверка след вход...';
+        splashDots.style.display = 'flex';
+        loginBtn.style.display = 'none';
+
+        // Малко забавяне за да се установи сесията
+        setTimeout(function() {
+          checkAuth();
+        }, 500);
+      }
+    }, 500);
+
+    // Fallback: ако не се затвори — възстановяваме бутона след 2 мин
+    setTimeout(function() {
+      clearInterval(checkWindowInterval);
+      loginBtn.textContent = 'Вход с Google';
+      loginBtn.disabled = false;
+      loginNote.style.display = 'block';
+    }, 120000);
   });
 
   // === Зареждаме iframe САМО когато потребителят е логнат ===
@@ -305,7 +333,7 @@
       setTimeout(hideSplash, 400);
     });
 
-    // Fallback timeout — ако iframe зареди бавно
+    // Fallback timeout
     setTimeout(hideSplash, 12000);
   }
 
@@ -335,7 +363,7 @@
     s.src = GAS_URL + '?action=check_auth&callback=onBrowserAuth';
     s.onerror = function() { showBrowserAuth(); };
     document.body.appendChild(s);
-    setTimeout(function() { if (!appLoaded) showBrowserAuth(); }, 5000);
+    setTimeout(function() { if (!appLoaded) showBrowserAuth(); }, 6000);
   }
 
   window.onBrowserAuth = function(data) {
@@ -348,8 +376,9 @@
     authOverlay.style.display = 'flex';
   }
 
+  // === BROWSER MODE: Login чрез popup (същата логика) ===
   authBtn.addEventListener('click', function() {
-    var w = window.open(GAS_URL + '?auth=1', '_blank');
+    var w = window.open(GAS_URL + '?pwa_auth=true', '_blank');
     authBtn.textContent = 'Чакам вход...';
     authBtn.disabled = true;
     var ci = setInterval(function() {
@@ -357,7 +386,11 @@
         clearInterval(ci);
         authOverlay.style.display = 'none';
         splash.style.display = 'flex';
-        loadApp();
+        splashSub.textContent = 'Проверка след вход...';
+        splashDots.style.display = 'flex';
+        setTimeout(function() {
+          checkAuth();
+        }, 500);
       }
     }, 500);
     setTimeout(function() { clearInterval(ci); authBtn.textContent = 'Вход с Google'; authBtn.disabled = false; }, 120000);
