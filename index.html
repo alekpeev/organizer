@@ -9,7 +9,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#FDE8F0">
   <meta name="application-name" content="Майчин Органайзър">
+  <link rel="canonical" href="https://alekpeev.github.io/organizer/">
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-180.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
   <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -72,17 +74,6 @@
     .step-content{flex:1}
     .step-title{font-weight:600;font-size:.92rem;color:var(--text)}
     .step-desc{font-size:.8rem;color:var(--text-s);margin-top:2px}
-    .safari-bar{margin-top:10px;background:#F5F5F5;border-radius:10px;padding:10px 14px;border:1px solid #E0E0E0}
-    .safari-icons{display:flex;align-items:center;justify-content:space-around}
-    .safari-icons span{font-size:1.1rem;color:#999}
-    .share-btn{background:#007AFF;padding:7px 9px;border-radius:9px;display:inline-flex;position:relative;animation:glow 2s ease-in-out infinite}
-    .share-btn svg{width:20px;height:20px;stroke:white;fill:none}
-    .share-dot{position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:#E53935;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:white}
-    .bar-hint{text-align:center;font-size:.7rem;color:#007AFF;font-weight:600;margin-top:6px}
-    @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(0,122,255,.3)}50%{box-shadow:0 0 0 8px rgba(0,122,255,0)}}
-    .menu-mock{margin-top:10px;background:white;border-radius:10px;border:1px solid #E0E0E0;overflow:hidden}
-    .menu-item{padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:.8rem;color:#999;border-bottom:1px solid #F0F0F0}
-    .menu-item.hl{background:rgba(0,122,255,.08);border:2px solid #007AFF;border-radius:8px;margin:3px;color:#007AFF;font-weight:600;border-bottom:2px solid #007AFF}
     .warning-box{background:#FFF6D9;border:1.5px solid #F0B429;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:.84rem;color:#7A6000;line-height:1.5}
     .warning-box strong{color:#5D4800}
     .desktop-msg{background:var(--white);border-radius:20px;padding:32px 20px;text-align:center;box-shadow:0 4px 20px rgba(61,43,43,.08);border:1.5px solid rgba(242,167,195,.2);margin:0}
@@ -135,13 +126,17 @@
         <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Горе вдясно — готово!</div></div></div></div>
       </div>
-      <div id="ios-chrome-steps" style="display:none"><div class="warning-box"><strong>⚠️ Отвори в Safari</strong> — само Safari поддържа „Към Нач. екран" на iPhone.</div></div>
+      <div id="ios-chrome-steps" style="display:none">
+        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни „Сподели"</div><div class="step-desc">Горе в лентата</div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div></div></div></div>
+        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Готово!</div></div></div></div>
+      </div>
       <div id="android-chrome-steps" style="display:none">
         <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Менюто ⋮</div><div class="step-desc">Горе вдясно в Chrome</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Добави към Нач. екран"</div></div></div></div>
         <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди „Инсталиране"</div></div></div></div>
       </div>
-      <div id="desktop-steps" style="display:none"><div class="desktop-msg"><div class="desktop-phone">📱</div><div class="desktop-title-d">Отвори от телефона си</div><div class="desktop-desc">Отвори линка от Safari (iPhone) или Chrome (Android)</div><div class="desktop-url">alekpeev.github.io/maichin-organizur</div></div></div>
+      <div id="desktop-steps" style="display:none"><div class="desktop-msg"><div class="desktop-phone">📱</div><div class="desktop-title-d">Отвори от телефона си</div><div class="desktop-desc">Отвори линка от Safari (iPhone) или Chrome (Android)</div><div class="desktop-url">alekpeev.github.io/organizer</div></div></div>
     </div>
     <div class="skip-row"><button class="skip-btn" id="skip-btn">Продължи без инсталация →</button></div>
   </div>
@@ -152,6 +147,27 @@
   'use strict';
 
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbwUDssTmamQyK0g1Lz38JYmbWfASw6xLgmYdKqblvYHTj9b0RmB_Kib43lSq6GGGWiiNQ/exec';
+
+  // ============================================================
+  // URL NORMALIZATION — Гарантира че винаги сме на правилен URL
+  // Safari може да запомни /organizer/ (без index.html) и някои
+  // mirror-и на GitHub може да дадат 404. Затова нормализираме.
+  // ============================================================
+  (function normalizeUrl() {
+    var expected = '/organizer/';
+    var path = window.location.pathname;
+    // Ако сме на /organizer (без slash) → redirect към /organizer/
+    if (path === '/organizer') {
+      window.location.replace('/organizer/');
+      return;
+    }
+    // Ако по някаква странна причина пътят не започва с /organizer/
+    // и сме на alekpeev.github.io — правим redirect
+    if (window.location.hostname === 'alekpeev.github.io' && path.indexOf(expected) !== 0) {
+      window.location.replace('https://alekpeev.github.io/organizer/');
+      return;
+    }
+  })();
 
   var frame = document.getElementById('app-frame');
   var splash = document.getElementById('splash');
@@ -164,7 +180,7 @@
   var installLanding = document.getElementById('install-landing');
   var skipBtn = document.getElementById('skip-btn');
   var appLoaded = false;
-  var authPhase = 'initial'; // 'initial' | 'waiting' | 'checking'
+  var authPhase = 'initial';
 
   var ua = navigator.userAgent;
   var isIOS = /iphone|ipad|ipod/i.test(ua);
@@ -173,22 +189,6 @@
 
   var isStandalone = (window.navigator.standalone === true) ||
                      window.matchMedia('(display-mode: standalone)').matches;
-
-  // ==========================================================
-  // ХИБРИДЕН POPUP + РЪЧЕН БУТОН
-  //
-  // 1. JSONP check_auth → логнат ли е?
-  // 2. ДА → iframe → fullscreen ✅
-  // 3. НЕ → бутон "Вход с Google"
-  // 4. Клик → window.open(GAS?pwa_auth=true) → POPUP
-  //    PWA остава в standalone! Не навигираме никъде.
-  // 5. Потребителят се логва в popup-а + дава permissions
-  // 6. Popup показва "Готово! Натисни Done/X"
-  // 7. Потребителят затваря popup-а ръчно
-  // 8. В PWA-то бутонът вече е "🔄 Вече влязох"
-  // 9. Натиска → checkAuth() → JSONP с first-party credit
-  // 10. Логнат → iframe → fullscreen ✅
-  // ==========================================================
 
   if (isStandalone) {
     installLanding.style.display = 'none';
@@ -199,7 +199,6 @@
     installLanding.classList.add('show');
   }
 
-  // === JSONP Auth Check ===
   function checkAuth() {
     var cbName = 'gasAuthCb_' + Math.round(Math.random() * 100000);
     var resolved = false;
@@ -215,12 +214,8 @@
       resolved = true;
       delete window[cbName];
       script.remove();
-
-      if (data && data.email) {
-        loadApp();
-      } else {
-        showLoginButton();
-      }
+      if (data && data.email) loadApp();
+      else showLoginButton();
     };
 
     script.onerror = function() {
@@ -232,20 +227,15 @@
     };
 
     setTimeout(function() {
-      if (!resolved) {
-        resolved = true;
-        showLoginButton();
-      }
+      if (!resolved) { resolved = true; showLoginButton(); }
     }, 6000);
 
     script.src = GAS_URL + '?action=check_auth&callback=' + cbName;
     document.body.appendChild(script);
   }
 
-  // === Показваме Login бутон ===
   function showLoginButton() {
     splashDots.style.display = 'none';
-
     if (authPhase === 'initial') {
       splashSub.textContent = 'Нужно е еднократно влизане';
       loginBtn.textContent = 'Вход с Google';
@@ -255,54 +245,40 @@
       loginBtn.textContent = '🔄 Вече влязох (Продължи)';
       loginBtn.disabled = false;
     }
-
     loginBtn.style.display = 'block';
     loginNote.style.display = 'block';
   }
 
-  // === STANDALONE: Popup за логин ===
   loginBtn.addEventListener('click', function() {
     if (authPhase === 'initial') {
-      // СТЪПКА 1: Отваряме popup за логин
       authPhase = 'waiting';
       window.open(GAS_URL + '?pwa_auth=true', '_blank');
-
-      // Сменяме бутона на "Вече влязох"
       splashSub.textContent = 'Влез в Google в отворения прозорец.\nСлед това се върни тук и натисни бутона.';
       loginBtn.textContent = '🔄 Вече влязох (Продължи)';
       loginNote.innerHTML = 'След като видиш "✅ Входът е успешен",<br>затвори прозореца и натисни бутона горе.';
-
     } else if (authPhase === 'waiting') {
-      // СТЪПКА 2: Потребителят е натиснал "Вече влязох"
-      // Проверяваме отново — user-initiated gesture!
       authPhase = 'checking';
       splashSub.textContent = 'Проверка след вход...';
       splashDots.style.display = 'flex';
       loginBtn.style.display = 'none';
       loginNote.style.display = 'none';
-
-      // Малко забавяне за сесията да се установи
       setTimeout(function() {
-        authPhase = 'initial'; // Reset за следващ опит ако не успее
+        authPhase = 'initial';
         checkAuth();
       }, 800);
     }
   });
 
-  // === Зареждаме iframe САМО когато е логнат ===
   function loadApp() {
     if (appLoaded) return;
     appLoaded = true;
     splashSub.textContent = 'Зарежда се...';
-
     frame.src = GAS_URL;
     frame.classList.add('visible');
-
     frame.addEventListener('load', function onL() {
       frame.removeEventListener('load', onL);
       setTimeout(hideSplash, 400);
     });
-
     setTimeout(hideSplash, 12000);
   }
 
@@ -312,8 +288,9 @@
     setTimeout(function() { splash.style.display = 'none'; }, 500);
   }
 
-  // === Browser mode ===
   function showPlatformSteps() {
+    // Важно: iOS Chrome ВЕЧЕ поддържа Add to Home Screen (от iOS 16.4+),
+    // затова показваме стъпки и за Chrome на iPhone, не warning.
     if (isIOS && isSafari) document.getElementById('ios-safari-steps').style.display = 'block';
     else if (isIOS) document.getElementById('ios-chrome-steps').style.display = 'block';
     else if (isAndroid) document.getElementById('android-chrome-steps').style.display = 'block';
@@ -345,7 +322,6 @@
     authOverlay.style.display = 'flex';
   }
 
-  // === BROWSER MODE: Също popup + ръчен бутон ===
   authBtn.addEventListener('click', function() {
     window.open(GAS_URL + '?pwa_auth=true', '_blank');
     authBtn.textContent = '🔄 Вече влязох';
