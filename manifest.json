@@ -2,7 +2,7 @@
   "name": "Майчин Органайзър",
   "short_name": "Органайзър",
   "description": "Всичко за бебето на едно място — ваксини, растеж, хранене, спомени и още.",
-  "start_url": "/organizer/",
+  "start_url": "/organizer/index.html",
   "scope": "/organizer/",
   "display": "standalone",
   "orientation": "portrait",
