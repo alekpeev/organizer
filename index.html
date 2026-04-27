@@ -23,18 +23,19 @@
   <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--pink:#F2A7C3;--pink-l:#FDE8F0;--pink-d:#D4688A;--cream:#FDF8F4;--mint:#A8D8C8;--mint-l:#E0F5EF;--lav:#C4B5E8;--lav-l:#EDE8FA;--text:#3D2B2B;--text-s:#8A6B6B;--text-xs:#B09898;--white:#fff}
+    :root{--pink:#F2A7C3;--pink-l:#FDE8F0;--pink-d:#D4688A;--cream:#FDF8F4;--mint:#A8D8C8;--mint-l:#E0F5EF;--lav:#C4B5E8;--lav-l:#EDE8FA;--text:#3D2B2B;--text-s:#8A6B6B;--text-xs:#B09898;--white:#fff;--green:#5CB878}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html,body{height:100%;height:100dvh;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--cream);color:var(--text);-webkit-font-smoothing:antialiased}
 
     #app-frame{position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:none;display:none;z-index:1;background:var(--cream)}
     #app-frame.visible{display:block}
 
-    #splash{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;transition:opacity .5s,visibility .5s;padding:20px}
+    /* Splash + Login screen */
+    #splash{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;transition:opacity .5s,visibility .5s;padding:24px;overflow-y:auto}
     #splash.hide{opacity:0;visibility:hidden;pointer-events:none}
     .splash-icon{width:110px;height:110px;border-radius:26px;box-shadow:0 8px 32px rgba(212,104,138,.25);margin-bottom:20px;animation:pulse 2s ease-in-out infinite}
     .splash-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--pink-d);text-align:center;line-height:1.2}
-    .splash-sub{color:var(--text-s);font-size:.9rem;margin-top:10px;transition:opacity .3s;text-align:center;padding:0 20px;max-width:340px;line-height:1.5}
+    .splash-sub{color:var(--text-s);font-size:.95rem;margin-top:14px;text-align:center;padding:0 20px;max-width:380px;line-height:1.6}
     .splash-dots{display:flex;gap:7px;margin-top:24px}
     .splash-dots span{width:9px;height:9px;border-radius:50%;background:var(--pink);animation:dot 1.2s ease infinite}
     .splash-dots span:nth-child(2){animation-delay:.2s;background:var(--mint)}
@@ -42,135 +43,145 @@
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
     @keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.2);opacity:1}}
 
-    #login-btn{display:none;margin-top:28px;background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:16px 40px;border-radius:16px;font-size:1.1rem;font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
-    #login-btn:active{transform:scale(.96)}
-    #login-btn:disabled{opacity:0.6;cursor:not-allowed}
-    #login-note{display:none;font-size:.82rem;color:var(--text-s);margin-top:14px;line-height:1.5;text-align:center;padding:0 20px;max-width:340px}
+    .login-btn{display:none;margin-top:28px;background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:16px 40px;border-radius:16px;font-size:1.1rem;font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
+    .login-btn:active{transform:scale(.96)}
+    .login-btn:disabled{opacity:0.6;cursor:not-allowed}
+    .login-note{display:none;font-size:.85rem;color:var(--text-s);margin-top:14px;line-height:1.5;text-align:center;padding:0 20px;max-width:380px}
 
-    #help-link{display:none;margin-top:18px;background:none;border:none;color:var(--text-s);text-decoration:underline;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+    /* Install screen (само след успешен login) */
+    #install-screen{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:60;padding:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    #install-screen.show{display:flex}
+    .install-success{width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:#fff;margin-bottom:18px;box-shadow:0 6px 20px rgba(92,184,120,.35)}
+    .install-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--pink-d);text-align:center;margin-bottom:10px;line-height:1.2}
+    .install-subtitle{font-size:.95rem;color:var(--text-s);text-align:center;margin-bottom:24px;line-height:1.5;max-width:380px}
+    .install-card{max-width:400px;width:100%;background:var(--white);border-radius:20px;padding:22px 20px;box-shadow:0 4px 20px rgba(61,43,43,.08);border:1.5px solid rgba(242,167,195,.2);margin-bottom:14px}
+    .install-step-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(242,167,195,.15)}
+    .install-step-row:last-child{border-bottom:none}
+    .install-step-num{width:30px;height:30px;min-width:30px;background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700}
+    .install-step-text{flex:1;padding-top:3px}
+    .install-step-title{font-weight:600;font-size:.95rem;color:var(--text);line-height:1.3}
+    .install-step-desc{font-size:.82rem;color:var(--text-s);margin-top:3px;line-height:1.4}
+    .install-skip{margin-top:14px;background:none;border:none;color:var(--text-s);text-decoration:underline;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;padding:10px}
 
-    #auth-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:60;padding:32px;text-align:center}
-    .auth-icon{width:90px;height:90px;border-radius:22px;margin-bottom:20px;box-shadow:0 4px 16px rgba(212,104,138,.2)}
-    .auth-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--pink-d);margin-bottom:12px}
-    .auth-desc{font-size:.95rem;color:var(--text-s);margin-bottom:28px;line-height:1.6;max-width:340px}
-    .auth-btn{background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:15px 36px;border-radius:14px;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(212,104,138,.35);font-family:'DM Sans',sans-serif;transition:transform .2s}
-    .auth-btn:active{transform:scale(.97)}
-    .auth-note{font-size:.78rem;color:var(--text-xs);margin-top:16px;line-height:1.5;max-width:340px}
-
-    #install-landing{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0 0%,#FDF8F4 40%,#E0F5EF 100%);display:none;z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch}
-    #install-landing.show{display:block}
-    .landing-inner{max-width:440px;margin:0 auto;padding:0 20px;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
-    .landing-hero{text-align:center;padding:48px 0 24px}
-    .landing-logo{width:100px;height:100px;border-radius:24px;box-shadow:0 8px 32px rgba(212,104,138,.3);margin-bottom:20px;border:3px solid rgba(242,167,195,.3)}
-    .landing-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--text);line-height:1.15}
-    .landing-subtitle{font-size:1rem;color:var(--text-s);margin-top:10px;line-height:1.6}
-    .landing-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
-    .feature-card{background:var(--white);border-radius:16px;padding:16px 14px;text-align:center;box-shadow:0 2px 12px rgba(61,43,43,.06);border:1px solid rgba(242,167,195,.15)}
-    .feature-icon{font-size:1.8rem;margin-bottom:6px}
-    .feature-name{font-size:.82rem;font-weight:600;color:var(--text)}
-    .install-cta{background:var(--white);border-radius:20px;padding:24px 20px;margin:24px 0;box-shadow:0 4px 20px rgba(61,43,43,.08);border:1.5px solid rgba(242,167,195,.2)}
-    .cta-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--text);text-align:center;margin-bottom:16px}
-    .cta-emoji{font-size:1.5rem;margin-right:6px;vertical-align:middle}
-    .install-step{background:var(--pink-l);border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(242,167,195,.15)}
-    .step-row{display:flex;align-items:flex-start;gap:12px}
-    .step-num{width:28px;height:28px;min-width:28px;background:var(--pink-d);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;margin-top:1px}
-    .step-content{flex:1}
-    .step-title{font-weight:600;font-size:.92rem;color:var(--text)}
-    .step-desc{font-size:.8rem;color:var(--text-s);margin-top:2px}
-    .desktop-msg{background:var(--white);border-radius:20px;padding:32px 20px;text-align:center;box-shadow:0 4px 20px rgba(61,43,43,.08);border:1.5px solid rgba(242,167,195,.2);margin:0}
-    .desktop-phone{font-size:3rem;margin-bottom:14px}
-    .desktop-title-d{font-weight:600;font-size:1.05rem;color:var(--text)}
-    .desktop-desc{font-size:.88rem;color:var(--text-s);margin-top:8px;line-height:1.5}
-    .desktop-url{display:inline-block;margin-top:12px;background:var(--pink-l);padding:8px 16px;border-radius:10px;font-size:.85rem;font-weight:600;color:var(--pink-d)}
-    .skip-row{text-align:center;margin-top:20px}
-    .skip-btn{background:none;border:none;color:var(--text-s);font-size:.85rem;text-decoration:underline;cursor:pointer;font-family:'DM Sans',sans-serif;padding:10px 20px}
-
-    /* Help модал */
-    #help-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
-    #help-modal.show{display:flex}
-    .help-box{background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-    .help-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--pink-d);margin-bottom:14px}
-    .help-text{font-size:.9rem;color:var(--text);line-height:1.6;margin-bottom:14px}
-    .help-text strong{color:var(--pink-d)}
-    .help-list{padding-left:20px;margin:10px 0}
-    .help-list li{margin-bottom:8px;font-size:.88rem;color:var(--text);line-height:1.5}
-    .help-close{background:linear-gradient(135deg,var(--pink),var(--pink-d));color:#fff;border:none;padding:12px 28px;border-radius:14px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:10px}
+    /* Error overlay */
+    #error-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#FDE8F0,#FDF8F4 50%,#E0F5EF);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:70;padding:24px;text-align:center}
+    #error-overlay.show{display:flex}
+    .error-icon{width:80px;height:80px;border-radius:50%;background:#E85D5D;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#fff;margin-bottom:18px}
+    .error-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--pink-d);margin-bottom:12px}
+    .error-msg{color:var(--text-s);font-size:.95rem;line-height:1.6;max-width:340px;margin-bottom:24px}
+    .error-btn{background:linear-gradient(135deg,var(--pink),var(--pink-d));color:var(--white);border:none;padding:14px 32px;border-radius:14px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
   </style>
 </head>
 <body>
 
+<!-- ============= SPLASH / LOGIN SCREEN ============= -->
 <div id="splash">
   <img src="icon-192.png" alt="Лого" class="splash-icon">
   <div class="splash-title">Майчин<br>Органайзър</div>
-  <div id="splash-sub" class="splash-sub">Проверка на профила...</div>
+  <div id="splash-sub" class="splash-sub">Зареждане...</div>
   <div id="splash-dots" class="splash-dots"><span></span><span></span><span></span></div>
-  <button id="login-btn">Вход с Google</button>
-  <div id="login-note">Еднократно влизане с Google акаунта ти.<br>След това приложението ще се отваря директно.</div>
-  <button id="help-link">❓ Не работи нещо?</button>
+  <button id="login-btn" class="login-btn">Вход с Google</button>
+  <div id="login-note" class="login-note">Еднократно влизане. След това всичко работи автоматично.</div>
 </div>
 
-<div id="auth-overlay">
-  <img src="icon-192.png" alt="Лого" class="auth-icon">
-  <div class="auth-title">Добре дошла!</div>
-  <div class="auth-desc">За да използваш приложението, трябва да влезеш с Google акаунта си и да разрешиш достъп до Sheets и Drive.</div>
-  <button class="auth-btn" id="auth-btn">Вход с Google</button>
-  <div class="auth-note">Ще се отвори прозорец за вход.<br>След като дадеш разрешенията — затвори го и се върни тук.</div>
+<!-- ============= INSTALL SCREEN (след успешен login) ============= -->
+<div id="install-screen">
+  <div class="install-success">✓</div>
+  <div class="install-title">Готово! Добре дошла 🌸</div>
+  <div class="install-subtitle">Запази на началния екран за бърз достъп — без всеки път да отваряш браузъра.</div>
+
+  <div class="install-card">
+    <div id="install-ios-safari" style="display:none">
+      <div class="install-step-row">
+        <div class="install-step-num">1</div>
+        <div class="install-step-text">
+          <div class="install-step-title">Натисни „Сподели"</div>
+          <div class="install-step-desc">Иконката долу в лентата на Safari</div>
+        </div>
+      </div>
+      <div class="install-step-row">
+        <div class="install-step-num">2</div>
+        <div class="install-step-text">
+          <div class="install-step-title">„Към началния екран"</div>
+          <div class="install-step-desc">Превърти надолу в менюто</div>
+        </div>
+      </div>
+      <div class="install-step-row">
+        <div class="install-step-num">3</div>
+        <div class="install-step-text">
+          <div class="install-step-title">Натисни „Добави"</div>
+          <div class="install-step-desc">Готово — иконата е на началния екран!</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="install-ios-chrome" style="display:none">
+      <div class="install-step-row">
+        <div class="install-step-num">1</div>
+        <div class="install-step-text">
+          <div class="install-step-title">Натисни „Сподели"</div>
+          <div class="install-step-desc">Иконката горе в лентата</div>
+        </div>
+      </div>
+      <div class="install-step-row">
+        <div class="install-step-num">2</div>
+        <div class="install-step-text">
+          <div class="install-step-title">„Към началния екран"</div>
+          <div class="install-step-desc">Превърти надолу в менюто</div>
+        </div>
+      </div>
+      <div class="install-step-row">
+        <div class="install-step-num">3</div>
+        <div class="install-step-text">
+          <div class="install-step-title">Натисни „Добави"</div>
+          <div class="install-step-desc">Готово!</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="install-android" style="display:none">
+      <div class="install-step-row">
+        <div class="install-step-num">1</div>
+        <div class="install-step-text">
+          <div class="install-step-title">Менюто ⋮</div>
+          <div class="install-step-desc">Горе вдясно в Chrome</div>
+        </div>
+      </div>
+      <div class="install-step-row">
+        <div class="install-step-num">2</div>
+        <div class="install-step-text">
+          <div class="install-step-title">„Добави към началния екран"</div>
+        </div>
+      </div>
+      <div class="install-step-row">
+        <div class="install-step-num">3</div>
+        <div class="install-step-text">
+          <div class="install-step-title">Потвърди „Инсталиране"</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="install-desktop" style="display:none">
+      <div style="text-align:center;padding:10px">
+        <div style="font-size:2.5rem;margin-bottom:10px">📱</div>
+        <div style="font-weight:600;font-size:1rem;color:var(--text);margin-bottom:6px">Отвори от телефона си</div>
+        <div style="font-size:.88rem;color:var(--text-s);line-height:1.5">За най-добро изживяване отвори линка от Safari (iPhone) или Chrome (Android).</div>
+      </div>
+    </div>
+  </div>
+
+  <button id="install-skip" class="install-skip">Продължи без инсталация →</button>
 </div>
 
+<!-- ============= IFRAME (нормално приложение след auth) ============= -->
 <iframe id="app-frame" allow="camera;microphone"></iframe>
 
-<div id="install-landing">
-  <div class="landing-inner">
-    <div class="landing-hero">
-      <img src="icon-192.png" alt="Лого" class="landing-logo">
-      <div class="landing-title">Майчин<br>Органайзър</div>
-      <div class="landing-subtitle">Всичко за бебето на едно място —<br>ваксини, растеж, хранене, спомени</div>
-    </div>
-    <div class="landing-features">
-      <div class="feature-card"><div class="feature-icon">💉</div><div class="feature-name">Ваксини</div></div>
-      <div class="feature-card"><div class="feature-icon">📸</div><div class="feature-name">Спомени</div></div>
-      <div class="feature-card"><div class="feature-icon">📏</div><div class="feature-name">Растеж</div></div>
-      <div class="feature-card"><div class="feature-icon">📝</div><div class="feature-name">Бележки</div></div>
-    </div>
-    <div class="install-cta">
-      <div class="cta-title"><span class="cta-emoji">📲</span> Запази на телефона си</div>
-      <div id="ios-safari-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни „Сподели"</div><div class="step-desc">Долу в лентата на Safari</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Горе вдясно — готово!</div></div></div></div>
-      </div>
-      <div id="ios-chrome-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Натисни „Сподели"</div><div class="step-desc">Горе в лентата</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Към Нач. екран"</div><div class="step-desc">Превърти надолу в менюто</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Натисни „Добави"</div><div class="step-desc">Готово!</div></div></div></div>
-      </div>
-      <div id="android-chrome-steps" style="display:none">
-        <div class="install-step"><div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Менюто ⋮</div><div class="step-desc">Горе вдясно в Chrome</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">„Добави към Нач. екран"</div></div></div></div>
-        <div class="install-step"><div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Потвърди „Инсталиране"</div></div></div></div>
-      </div>
-      <div id="desktop-steps" style="display:none"><div class="desktop-msg"><div class="desktop-phone">📱</div><div class="desktop-title-d">Отвори от телефона си</div><div class="desktop-desc">Отвори линка от Safari (iPhone) или Chrome (Android)</div><div class="desktop-url">alekpeev.github.io/organizer</div></div></div>
-    </div>
-    <div class="skip-row"><button class="skip-btn" id="skip-btn">Продължи без инсталация →</button></div>
-  </div>
-</div>
-
-<!-- Help модал -->
-<div id="help-modal">
-  <div class="help-box">
-    <div class="help-title">❓ Помощ при вход</div>
-    <div class="help-text">Ако виждаш екран с катинарче <strong>"Нужни са разрешения"</strong>:</div>
-    <ol class="help-list">
-      <li>Натисни <strong>"Дай разрешения"</strong> в приложението</li>
-      <li>Ще се отвори нов прозорец на Google</li>
-      <li>Влез с твоя Google акаунт (ако те пита)</li>
-      <li><strong>На екрана с разрешения</strong> избери <strong>"Allow / Разреши"</strong></li>
-      <li>Затвори новия прозорец и се върни в приложението</li>
-      <li>Натисни <strong>"Готово, провери"</strong></li>
-    </ol>
-    <div class="help-text">Ако още не работи — затвори напълно приложението (от менюто за многозадачност на телефона) и го отвори отново.</div>
-    <button class="help-close" onclick="document.getElementById('help-modal').classList.remove('show')">Затвори</button>
-  </div>
+<!-- ============= ERROR OVERLAY ============= -->
+<div id="error-overlay">
+  <div class="error-icon">⚠️</div>
+  <div class="error-title">Възникна проблем</div>
+  <div id="error-msg" class="error-msg">Опитай отново или презареди страницата.</div>
+  <button class="error-btn" onclick="location.href=location.origin+location.pathname">🔄 Опитай отново</button>
 </div>
 
 <script>
@@ -179,17 +190,14 @@
 
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbwUDssTmamQyK0g1Lz38JYmbWfASw6xLgmYdKqblvYHTj9b0RmB_Kib43lSq6GGGWiiNQ/exec';
 
-  // ============================================================
-  // URL NORMALIZATION
-  // ============================================================
+  // URL normalization
   (function normalizeUrl() {
-    var expected = '/organizer/';
     var path = window.location.pathname;
     if (path === '/organizer') {
       window.location.replace('/organizer/');
       return;
     }
-    if (window.location.hostname === 'alekpeev.github.io' && path.indexOf(expected) !== 0) {
+    if (window.location.hostname === 'alekpeev.github.io' && path.indexOf('/organizer/') !== 0) {
       window.location.replace('https://alekpeev.github.io/organizer/');
       return;
     }
@@ -201,90 +209,89 @@
   var splashDots = document.getElementById('splash-dots');
   var loginBtn = document.getElementById('login-btn');
   var loginNote = document.getElementById('login-note');
-  var helpLink = document.getElementById('help-link');
-  var authOverlay = document.getElementById('auth-overlay');
-  var authBtn = document.getElementById('auth-btn');
-  var installLanding = document.getElementById('install-landing');
-  var skipBtn = document.getElementById('skip-btn');
-  var helpModal = document.getElementById('help-modal');
+  var installScreen = document.getElementById('install-screen');
+  var installSkip = document.getElementById('install-skip');
+  var errorOverlay = document.getElementById('error-overlay');
+  var errorMsg = document.getElementById('error-msg');
   var appLoaded = false;
-  var authPhase = 'initial';
-  var authPopupRef = null;
 
   var ua = navigator.userAgent;
   var isIOS = /iphone|ipad|ipod/i.test(ua);
   var isAndroid = /android/i.test(ua);
   var isSafari = isIOS && /safari/i.test(ua) && !/crios|fxios|opios|edgios/i.test(ua);
-
-  var isStandalone = (window.navigator.standalone === true) ||
-                     window.matchMedia('(display-mode: standalone)').matches;
+  var isStandalone = (window.navigator.standalone === true) || window.matchMedia('(display-mode: standalone)').matches;
 
   // ============================================================
-  // СЛУШАТЕЛ ЗА СЪОБЩЕНИЯ ОТ IFRAME-А (Apps Script)
+  // ПРОВЕРКА ЗА URL ПАРАМЕТРИ (auth_done от Apps Script redirect)
   // ============================================================
-  window.addEventListener('message', function(event) {
-    if (!event.data || typeof event.data !== 'object') return;
+  var urlParams = new URLSearchParams(window.location.search);
+  var authDoneParam = urlParams.get('auth_done');
+  var errParam = urlParams.get('err');
 
-    if (event.data.type === 'MO_REQUEST_AUTH') {
-      // iframe-ът иска OAuth re-auth - отваряме поп-ъп
-      openAuthPopup();
+  // Изчистваме параметрите от URL-а (за да не се показват в адресната лента)
+  if (authDoneParam || errParam) {
+    var cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
+  // ============================================================
+  // INIT - решава кой екран да покаже
+  // ============================================================
+
+  if (errParam) {
+    // Има грешка от auth-init redirect
+    showError(decodeURIComponent(errParam));
+    return;
+  }
+
+  if (authDoneParam === 'true') {
+    // Току-що се върна от Apps Script с успешен OAuth
+    if (isStandalone) {
+      // Вече сме в PWA - просто зареждаме приложението
+      loadApp();
+    } else {
+      // В browser сме - показваме install screen
+      showInstallScreen();
     }
-  });
-
-  function openAuthPopup() {
-    try {
-      authPopupRef = window.open(GAS_URL + '?pwa_auth=true', 'mo_auth_popup',
-        'width=480,height=720,toolbar=no,menubar=no,location=no');
-    } catch (e) {
-      authPopupRef = window.open(GAS_URL + '?pwa_auth=true', '_blank');
-    }
-    showToast('Дай разрешенията в новия прозорец и се върни');
+    return;
   }
 
-  function showToast(msg) {
-    var t = document.createElement('div');
-    t.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);background:#3D2B2B;color:#fff;padding:12px 20px;border-radius:14px;font-size:0.88rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.3);max-width:80%;text-align:center;line-height:1.4';
-    t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(function() { t.remove(); }, 4000);
+  if (authDoneParam === 'false') {
+    showError('Не успяхме да получим разрешения. Опитай отново.');
+    return;
   }
+
+  // Нормално зареждане - правим JSONP проверка
+  checkAuth();
 
   // ============================================================
-  // INIT
+  // CHECK AUTH (JSONP)
   // ============================================================
-  if (isStandalone) {
-    installLanding.style.display = 'none';
-    checkAuth();
-  } else {
-    splash.style.display = 'none';
-    showPlatformSteps();
-    installLanding.classList.add('show');
-  }
-
   function checkAuth() {
     var cbName = 'gasAuthCb_' + Math.round(Math.random() * 100000);
     var resolved = false;
     var script = document.createElement('script');
 
-    splashSub.textContent = 'Проверка на профила...';
+    splashSub.textContent = 'Проверка...';
     splashDots.style.display = 'flex';
     loginBtn.style.display = 'none';
     loginNote.style.display = 'none';
-    helpLink.style.display = 'none';
 
     window[cbName] = function(data) {
       if (resolved) return;
       resolved = true;
       delete window[cbName];
       script.remove();
-      // КРИТИЧНО: Зареждаме приложението САМО ако имаме И email И пълен достъп
       if (data && data.email && data.hasAccess) {
-        loadApp();
-      } else if (data && data.email && !data.hasAccess) {
-        // Имаме email но няма пълни scopes - трябва нов вход
-        showLoginButton('partial');
+        // Имаме всичко - зареждаме приложението
+        if (isStandalone) {
+          loadApp();
+        } else {
+          showInstallScreen();
+        }
       } else {
-        showLoginButton('none');
+        // Трябва да направим OAuth - показваме login бутона
+        showLoginButton(data && data.email ? 'partial' : 'none');
       }
     };
 
@@ -306,61 +313,70 @@
 
   function showLoginButton(reason) {
     splashDots.style.display = 'none';
-    if (authPhase === 'initial') {
-      if (reason === 'partial') {
-        splashSub.innerHTML = 'Влязла си, но липсват разрешения<br>за Google Sheets и Drive';
-        loginBtn.textContent = '🔓 Дай разрешения';
-      } else {
-        splashSub.textContent = 'Нужно е еднократно влизане';
-        loginBtn.textContent = 'Вход с Google';
-      }
-      loginBtn.disabled = false;
-    } else if (authPhase === 'waiting') {
-      splashSub.innerHTML = 'Влез в Google в отворения прозорец<br>и дай разрешенията.<br>След това натисни бутона долу.';
-      loginBtn.textContent = '🔄 Вече влязох (Продължи)';
-      loginBtn.disabled = false;
+    if (reason === 'partial') {
+      splashSub.innerHTML = 'Влязла си, но липсват разрешения<br>за Google Sheets и Drive';
+      loginBtn.textContent = '🔓 Дай разрешения';
+    } else {
+      splashSub.textContent = 'Нужно е еднократно влизане';
+      loginBtn.textContent = 'Вход с Google';
     }
+    loginBtn.disabled = false;
     loginBtn.style.display = 'block';
     loginNote.style.display = 'block';
-    helpLink.style.display = 'inline-block';
   }
 
+  // ============================================================
+  // LOGIN BUTTON: Прави FULL REDIRECT към Apps Script (без iframe)
+  // Това е КРИТИЧНОТО решение - без iframe Google показва пълен OAuth dialog
+  // ============================================================
   loginBtn.addEventListener('click', function() {
-    if (authPhase === 'initial') {
-      authPhase = 'waiting';
-      try {
-        authPopupRef = window.open(GAS_URL + '?pwa_auth=true', 'mo_auth_popup',
-          'width=480,height=720,toolbar=no,menubar=no,location=no');
-      } catch (e) {
-        authPopupRef = window.open(GAS_URL + '?pwa_auth=true', '_blank');
-      }
-      splashSub.innerHTML = 'Влез в Google и дай разрешенията.<br>След това се върни тук и натисни бутона.';
-      loginBtn.textContent = '🔄 Вече влязох (Продължи)';
-      loginNote.innerHTML = 'След като видиш "✅ Готово",<br>затвори прозореца ръчно и натисни бутона горе.';
-    } else if (authPhase === 'waiting') {
-      authPhase = 'checking';
-      splashSub.textContent = 'Проверка след вход...';
-      splashDots.style.display = 'flex';
-      loginBtn.style.display = 'none';
-      loginNote.style.display = 'none';
-      helpLink.style.display = 'none';
-      // Опит да затворим поп-ъпа ако е още отворен
-      try { if (authPopupRef && !authPopupRef.closed) authPopupRef.close(); } catch (e) {}
-      setTimeout(function() {
-        authPhase = 'initial';
-        checkAuth();
-      }, 1200);
-    }
+    loginBtn.disabled = true;
+    splashSub.textContent = 'Пренасочваме те към Google...';
+    splashDots.style.display = 'flex';
+    loginBtn.style.display = 'none';
+    loginNote.style.display = 'none';
+
+    // FULL PAGE REDIRECT - НЕ window.open! Това е ключово.
+    setTimeout(function() {
+      window.location.href = GAS_URL + '?auth_init=true';
+    }, 300);
   });
 
-  helpLink.addEventListener('click', function() {
-    helpModal.classList.add('show');
+  // ============================================================
+  // INSTALL SCREEN - показва се след успешен OAuth
+  // ============================================================
+  function showInstallScreen() {
+    // Скриваме splash
+    splash.style.display = 'none';
+
+    // Показваме съответните стъпки
+    if (isIOS && isSafari) document.getElementById('install-ios-safari').style.display = 'block';
+    else if (isIOS) document.getElementById('install-ios-chrome').style.display = 'block';
+    else if (isAndroid) document.getElementById('install-android').style.display = 'block';
+    else document.getElementById('install-desktop').style.display = 'block';
+
+    installScreen.classList.add('show');
+  }
+
+  installSkip.addEventListener('click', function() {
+    installScreen.classList.remove('show');
+    installScreen.style.display = 'none';
+    splash.style.display = 'flex';
+    loadApp();
   });
 
+  // ============================================================
+  // LOAD APP (зарежда iframe-а)
+  // ============================================================
   function loadApp() {
     if (appLoaded) return;
     appLoaded = true;
-    splashSub.textContent = 'Зарежда се...';
+    splash.style.display = 'flex';
+    splashSub.textContent = 'Зареждане на приложението...';
+    splashDots.style.display = 'flex';
+    loginBtn.style.display = 'none';
+    loginNote.style.display = 'none';
+
     frame.src = GAS_URL + '?t=' + Date.now();
     frame.classList.add('visible');
     frame.addEventListener('load', function onL() {
@@ -372,45 +388,17 @@
 
   function hideSplash() {
     splash.classList.add('hide');
-    authOverlay.style.display = 'none';
     setTimeout(function() { splash.style.display = 'none'; }, 500);
   }
 
-  function showPlatformSteps() {
-    if (isIOS && isSafari) document.getElementById('ios-safari-steps').style.display = 'block';
-    else if (isIOS) document.getElementById('ios-chrome-steps').style.display = 'block';
-    else if (isAndroid) document.getElementById('android-chrome-steps').style.display = 'block';
-    else document.getElementById('desktop-steps').style.display = 'block';
+  function showError(msg) {
+    splash.style.display = 'none';
+    installScreen.style.display = 'none';
+    errorMsg.textContent = msg || 'Опитай отново.';
+    errorOverlay.classList.add('show');
   }
 
-  skipBtn.addEventListener('click', function() {
-    installLanding.classList.remove('show');
-    installLanding.style.display = 'none';
-    splash.style.display = 'flex';
-    checkAuth();
-  });
-
-  authBtn.addEventListener('click', function() {
-    try {
-      authPopupRef = window.open(GAS_URL + '?pwa_auth=true', 'mo_auth_popup',
-        'width=480,height=720,toolbar=no,menubar=no,location=no');
-    } catch (e) {
-      authPopupRef = window.open(GAS_URL + '?pwa_auth=true', '_blank');
-    }
-    authBtn.textContent = '🔄 Вече влязох';
-    var newHandler = function() {
-      authBtn.removeEventListener('click', newHandler);
-      authOverlay.style.display = 'none';
-      splash.style.display = 'flex';
-      splashSub.textContent = 'Проверка след вход...';
-      splashDots.style.display = 'flex';
-      try { if (authPopupRef && !authPopupRef.closed) authPopupRef.close(); } catch (e) {}
-      setTimeout(function() { checkAuth(); }, 1200);
-    };
-    authBtn.removeEventListener('click', arguments.callee);
-    authBtn.addEventListener('click', newHandler);
-  });
-
+  // Service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function() {});
   }
